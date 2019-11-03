@@ -43,6 +43,10 @@ public class BothArms : MonoBehaviour, ILoggerProvider {
 	public float   newX_angle_LH;
 	public float   newZ_angle_LH;
 
+	public float   newY_angle_LLA;
+	public float   newX_angle_LLA;
+	public float   newZ_angle_LLA;
+	
 	public float quaternionX_RH;
 	public float quaternionY_RH;
 	public float quaternionZ_RH;
@@ -54,9 +58,26 @@ public class BothArms : MonoBehaviour, ILoggerProvider {
 	public float quaternionX_LH;
 	public float quaternionY_LH;
 	public float quaternionZ_LH;
+
+	public float quaternionX_LLA;
+	public float quaternionY_LLA;
+	public float quaternionZ_LLA;
 	
 	// Use this for initialization
 	void Start () {
+		/*
+		Initial position
+		*/
+		
+		newX_angle_RH = 0;
+		newY_angle_RH = 90;
+		newZ_angle_RH = 0;
+		
+		newX_angle_LH = 0;
+		newY_angle_LH = -90;
+		newZ_angle_LH = 0; 
+		/*---------------------*/
+		
 		
 		Debug.Log("Start");
 		Debug.Log("Looking for peripheral");
@@ -80,12 +101,6 @@ public class BothArms : MonoBehaviour, ILoggerProvider {
 		else
 			Hand_R.transform.localEulerAngles = new Vector3(newX_angle_RH, newY_angle_RH , newZ_angle_RH);
 		
-		//Rigth Low Arm
-	/*	if(newY_angle_RLA < 0)
-			LowArm_R.transform.localEulerAngles = new Vector3(newZ_angle_RLA, newY_angle_RLA , -newX_angle_RLA );
-		else*/
-			LowArm_R.transform.localEulerAngles = new Vector3(newX_angle_RLA, newY_angle_RLA , 0);
-		
 		
 		//Left Hand 
 		if(newY_angle_LH > 0)
@@ -93,6 +108,9 @@ public class BothArms : MonoBehaviour, ILoggerProvider {
 		else
 			Hand_L.transform.localEulerAngles = new Vector3(newX_angle_LH, newY_angle_LH , newZ_angle_LH);
 		
+		//Arms
+		LowArm_R.transform.localEulerAngles = new Vector3(newX_angle_RLA, newY_angle_RLA , 0);
+		LowArm_L.transform.localEulerAngles = new Vector3(newX_angle_LLA, newY_angle_LLA , 0);
 	}
 	
 	
@@ -124,19 +142,25 @@ public class BothArms : MonoBehaviour, ILoggerProvider {
                 Peripheral_RH = board;
                 Peripheral_RH.StreamReceived += Peripheral_StreamReceived_RH;
                 Peripheral_RH.PropertyChanged += Peripheral_PropertyChanged_RH;
-                await board.StartAsync();
+                await Peripheral_RH.StartAsync();
 				} //Left Hand
 				else if (board.Name == "CaptoGlove2469"){
 				Peripheral_LH = board;
                 Peripheral_LH.StreamReceived += Peripheral_StreamReceived_LH;
                 Peripheral_LH.PropertyChanged += Peripheral_PropertyChanged_LH;
-                await board.StartAsync();				
+                await Peripheral_LH.StartAsync();				
 				} //Right Low Arm
 				else if (board.Name == "CaptoGlove2443"){
 				Peripheral_RLA = board;
                 Peripheral_RLA.StreamReceived += Peripheral_StreamReceived_RLA;
                 Peripheral_RLA.PropertyChanged += Peripheral_PropertyChanged_RLA;
-                await board.StartAsync();				
+                await Peripheral_RLA.StartAsync();				
+				} //Left Low Arm
+				else if (board.Name == "CaptoGlove2502"){
+				Peripheral_LLA = board;
+                Peripheral_LLA.StreamReceived += Peripheral_StreamReceived_LLA;
+                Peripheral_LLA.PropertyChanged += Peripheral_PropertyChanged_LLA;
+                await Peripheral_LLA.StartAsync();				
 				}
 				
                 return;
@@ -169,7 +193,7 @@ public class BothArms : MonoBehaviour, ILoggerProvider {
 				Debug.Log("--- Set timeslot");
 				StreamTimeslots st = new StreamTimeslots(); 
 				st.Set(1, BoardStreamType.TaredQuaternion);
-				Peripheral_RH.StreamTimeslots.WriteAsync(st);				
+				await Peripheral_RH.StreamTimeslots.WriteAsync(st);				
 				await Peripheral_RH.StreamTimeslots.ReadAsync();
             }
         }
@@ -198,7 +222,7 @@ public class BothArms : MonoBehaviour, ILoggerProvider {
 				Debug.Log("--- Set timeslot");
 				StreamTimeslots st = new StreamTimeslots(); 
 				st.Set(3, BoardStreamType.TaredQuaternion);
-				Peripheral_RLA.StreamTimeslots.WriteAsync(st);				
+				await Peripheral_RLA.StreamTimeslots.WriteAsync(st);				
 				await Peripheral_RLA.StreamTimeslots.ReadAsync();
             }
         }
@@ -227,11 +251,40 @@ public class BothArms : MonoBehaviour, ILoggerProvider {
 				Debug.Log("--- Set timeslot");
 				StreamTimeslots st = new StreamTimeslots(); 
 				st.Set(1, BoardStreamType.TaredQuaternion);
-				Peripheral_LH.StreamTimeslots.WriteAsync(st);				
+				await Peripheral_LH.StreamTimeslots.WriteAsync(st);				
 				await Peripheral_LH.StreamTimeslots.ReadAsync();
             }
         }
     }
+	
+	private async void Peripheral_PropertyChanged_LLA(object sender, PropertyChangedEventArgs e) {
+		
+		Debug.Log("- Property changed R: " + e.PropertyName.ToString());  
+		 
+        if (e.PropertyName == PeripheralProperty.Status) {
+			
+            Debug.Log("Board status: " + Peripheral_LLA.Status.ToString());
+			
+            if (Peripheral_LLA.Status == PeripheralStatus.Connected) {
+				
+				Debug.Log("----- Read Attributes -------"); 
+				
+				Debug.Log("FW: " + Peripheral_LLA.FirmwareVersion);
+				
+				Debug.Log("--- Test Functions ");
+				
+				await Peripheral_LLA.CalibrateGyroAsync();
+				await Peripheral_LLA.TareAsync();
+				await Peripheral_LLA.CommitChangesAsync();
+				
+				Debug.Log("--- Set timeslot");
+				StreamTimeslots st = new StreamTimeslots(); 
+				st.Set(1, BoardStreamType.TaredQuaternion);
+				await Peripheral_LLA.StreamTimeslots.WriteAsync(st);				
+				await Peripheral_LLA.StreamTimeslots.ReadAsync();
+            }
+        }
+    }	
 	
 	private void Peripheral_StreamReceived_RH(object sender, BoardStreamEventArgs e) {
 		
@@ -258,32 +311,15 @@ public class BothArms : MonoBehaviour, ILoggerProvider {
 			quaternionY_RH  = float.Parse(oneValue[1]);		
 			quaternionZ_RH  = float.Parse(oneValue[2]);
 				
-				/* no limitations*/
-				/*
-				a=180f;
-				b=0f;				
+			/* no limitations*/
 				
-				newX_angle_RH = b + quaternionX*a;//pitch
-				newZ_angle_RH = -quaternionY*a;//yaw
-				newY_angle_RH = 90+quaternionZ*a;//roll
-				*/
+			a=180f;
+			b=90f;				
 				
-				/*limitations not big difference*/
-				a=150f;
-				b=0f;				
+			newX_angle_RH = quaternionX_RH*a;	//pitch
+			newZ_angle_RH = -quaternionY_RH*a;	//yaw
+			newY_angle_RH = quaternionZ_RH*a + b;//roll
 				
-				newX_angle_RH = b + quaternionX_RH*a;//pitch
-				
-				
-				a=120f;
-				b=0f;				
-				
-				newZ_angle_RH = b-quaternionY_RH*a;//yaw
-				
-				a=168.75f;
-				b=78.75f;				
-				
-				newY_angle_RH = b+quaternionZ_RH*a;//roll
 				
 		}
     }
@@ -317,9 +353,7 @@ public class BothArms : MonoBehaviour, ILoggerProvider {
 			a=180f;
 			b=0f;				
 				
-			//newZ_angle_RUA = b + quaternionX_RLA*a;	//pitch - up arm
-			
-			newX_angle_RLA = -quaternionY_RLA*90f+20f;	//yaw - only low arm 
+			newX_angle_RLA = -quaternionY_RLA*a;	//yaw 
 			newY_angle_RLA = quaternionZ_RLA*a;	//roll - only low arm		
 				
 				
@@ -354,12 +388,48 @@ public class BothArms : MonoBehaviour, ILoggerProvider {
 			/* no limitations*/
 				
 			a=180f;
+			b=90f;				
+				
+			newX_angle_LH = -quaternionX_LH*a;	//pitch
+			newZ_angle_LH = quaternionY_LH*a;	//yaw
+			newY_angle_LH = quaternionZ_LH*a - b;//roll
+			
+				
+		}
+    }
+
+	private void Peripheral_StreamReceived_LLA(object sender, BoardStreamEventArgs e) {
+		
+		Debug.Log("- Stream Received : " + e.StreamType.ToString());
+	
+		float a;
+		float b;
+		
+		if (e.StreamType == BoardStreamType.TaredQuaternion) {
+            var args = e as BoardQuaternionEventArgs;
+			
+            Debug.Log("Received tared quaternion: " + args.Value);
+			
+			var value =  args.Value.ToString();			
+			var charsToRemove = new string[] { "(", ")" };
+			foreach (var c in charsToRemove)
+			{
+				value = value.Replace(c, string.Empty);
+			}		
+
+			List<string> oneValue = value.Split(',').ToList<string>();
+				
+			quaternionX_LLA  = float.Parse(oneValue[0]);	
+			quaternionY_LLA  = float.Parse(oneValue[1]);		
+			quaternionZ_LLA  = float.Parse(oneValue[2]);
+				
+			/* no limitations*/
+			a=180f;
 			b=0f;				
 				
-			newX_angle_LH = b - quaternionX_LH*a;//pitch
-			newZ_angle_LH = quaternionY_LH*a;//yaw
-			newY_angle_LH = -90+quaternionZ_LH*a;//roll
-			
+			newX_angle_LLA = -quaternionY_LLA*a;	//yaw 
+			newY_angle_LLA = quaternionZ_LLA*a;	//roll - only low arm		
+				
 				
 		}
     }
@@ -368,7 +438,7 @@ public class BothArms : MonoBehaviour, ILoggerProvider {
         Debug.Log("Stopping");
 		
         if (Peripheral_RH != null) {
-			 Debug.Log("Stop Peripheral_RH");
+			 Debug.Log("Stop RH Peripheral");
             await Peripheral_RH?.EmulationState.WriteAsync(false);
 			Peripheral_RH.StreamReceived -= Peripheral_StreamReceived_RH;
             Peripheral_RH.PropertyChanged -= Peripheral_PropertyChanged_RH;
@@ -378,7 +448,7 @@ public class BothArms : MonoBehaviour, ILoggerProvider {
         }
 		
 		if (Peripheral_LH != null) {
-			 Debug.Log("Stop L Peripheral");
+			 Debug.Log("Stop LH Peripheral");
             await Peripheral_LH?.EmulationState.WriteAsync(false);
 			Peripheral_LH.StreamReceived -= Peripheral_StreamReceived_LH;
             Peripheral_LH.PropertyChanged -= Peripheral_PropertyChanged_LH;
@@ -397,7 +467,16 @@ public class BothArms : MonoBehaviour, ILoggerProvider {
             Peripheral_RLA = null;
         }
 		
-
+		if (Peripheral_LLA != null) {
+			 Debug.Log("Stop LLA Peripheral");
+            await Peripheral_LLA?.EmulationState.WriteAsync(false);
+			Peripheral_LLA.StreamReceived -= Peripheral_StreamReceived_LLA;
+            Peripheral_LLA.PropertyChanged -= Peripheral_PropertyChanged_LLA;
+			await Peripheral_LLA.StopAsync();
+            Peripheral_LLA.Dispose();
+            Peripheral_LLA = null;
+        }
+		
         if (Central != null) {
 			Debug.Log("Stop Central");
 			Central.StopScan();
