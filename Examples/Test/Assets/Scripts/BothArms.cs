@@ -24,8 +24,8 @@ public class BothArms : MonoBehaviour, ILoggerProvider {
 	public Transform   Hand_L;
 	public Transform   LowArm_R;
 	public Transform   LowArm_L;
-//	public Transform   UpArm_R;
-//	public Transform   UpArm_L;
+	public Transform   UpArm_R;
+	public Transform   UpArm_L;
 	
 	public float   newY_angle_RH;
 	public float   newX_angle_RH;
@@ -46,6 +46,10 @@ public class BothArms : MonoBehaviour, ILoggerProvider {
 	public float   newY_angle_LLA;
 	public float   newX_angle_LLA;
 	public float   newZ_angle_LLA;
+
+	public float   newY_angle_LUA;
+	public float   newX_angle_LUA;
+	public float   newZ_angle_LUA;
 	
 	public float quaternionX_RH;
 	public float quaternionY_RH;
@@ -54,6 +58,10 @@ public class BothArms : MonoBehaviour, ILoggerProvider {
 	public float quaternionX_RLA;
 	public float quaternionY_RLA;
 	public float quaternionZ_RLA;
+
+	public float quaternionX_RUA;
+	public float quaternionY_RUA;
+	public float quaternionZ_RUA;
 	
 	public float quaternionX_LH;
 	public float quaternionY_LH;
@@ -62,6 +70,10 @@ public class BothArms : MonoBehaviour, ILoggerProvider {
 	public float quaternionX_LLA;
 	public float quaternionY_LLA;
 	public float quaternionZ_LLA;
+	
+	public float quaternionX_LUA;
+	public float quaternionY_LUA;
+	public float quaternionZ_LUA;
 	
 	// Use this for initialization
 	void Start () {
@@ -73,9 +85,18 @@ public class BothArms : MonoBehaviour, ILoggerProvider {
 		newY_angle_RH = 90;
 		newZ_angle_RH = 0;
 		
+		newX_angle_RUA = -100;
+		newY_angle_RUA = 0;
+		newZ_angle_RUA = 0;
+		
 		newX_angle_LH = 0;
 		newY_angle_LH = -90;
 		newZ_angle_LH = 0; 
+		
+		newX_angle_LUA = 80;
+		newY_angle_LUA = 180;
+		newZ_angle_LUA = 180;
+		
 		/*---------------------*/
 		
 		
@@ -108,9 +129,13 @@ public class BothArms : MonoBehaviour, ILoggerProvider {
 		else
 			Hand_L.transform.localEulerAngles = new Vector3(newX_angle_LH, newY_angle_LH , newZ_angle_LH);
 		
-		//Arms
+		//Low Arms
 		LowArm_R.transform.localEulerAngles = new Vector3(newX_angle_RLA, newY_angle_RLA , 0);
-		LowArm_L.transform.localEulerAngles = new Vector3(newX_angle_LLA, newY_angle_LLA , 0);
+		LowArm_L.transform.localEulerAngles = new Vector3(newX_angle_LLA, 0 , 0);
+		
+		//Up Arms 
+		UpArm_L.transform.localEulerAngles = new Vector3(newX_angle_LUA, newY_angle_LUA, newZ_angle_LUA);
+		UpArm_R.transform.localEulerAngles = new Vector3(newX_angle_RUA, newY_angle_RUA, newZ_angle_RUA);
 	}
 	
 	
@@ -318,9 +343,8 @@ public class BothArms : MonoBehaviour, ILoggerProvider {
 				
 			newX_angle_RH = quaternionX_RH*a;	//pitch
 			newZ_angle_RH = -quaternionY_RH*a;	//yaw
-			newY_angle_RH = quaternionZ_RH*a + b;//roll
-				
-				
+	
+			newY_angle_RH = quaternionZ_RH*a + b;//roll	
 		}
     }
 	
@@ -353,10 +377,10 @@ public class BothArms : MonoBehaviour, ILoggerProvider {
 			a=180f;
 			b=0f;				
 				
-			newX_angle_RLA = -quaternionY_RLA*a;	//yaw 
-			newY_angle_RLA = quaternionZ_RLA*a;	//roll - only low arm		
-				
-				
+			newX_angle_RLA = -quaternionY_RLA*a; //yaw 
+			newY_angle_RLA = quaternionZ_RLA*a;	//roll - only low arm	
+			newZ_angle_RUA = quaternionX_RLA*(-90f);  // pitch  in up arm 
+
 		}
     }
 	
@@ -393,6 +417,8 @@ public class BothArms : MonoBehaviour, ILoggerProvider {
 			newX_angle_LH = -quaternionX_LH*a;	//pitch
 			newZ_angle_LH = quaternionY_LH*a;	//yaw
 			newY_angle_LH = quaternionZ_LH*a - b;//roll
+			//newY_angle_LLA = quaternionZ_LH*a;	// roll low arm	
+			//newY_angle_LUA = -quaternionZ_LH*a + 360;
 			
 				
 		}
@@ -426,9 +452,11 @@ public class BothArms : MonoBehaviour, ILoggerProvider {
 			/* no limitations*/
 			a=180f;
 			b=0f;				
-				
-			newX_angle_LLA = -quaternionY_LLA*a;	//yaw 
-			newY_angle_LLA = quaternionZ_LLA*a;	//roll - only low arm		
+			
+			//newZ_angle_LUA = -quaternionX_LLA*a + a;			
+			//newX_angle_LLA = -quaternionY_LLA*a;	//yaw 
+			//newY_angle_LLA = quaternionZ_LLA*a;	//roll - only low arm		
+			newZ_angle_LUA = quaternionX_LLA*(-90f)+180f;
 				
 				
 		}

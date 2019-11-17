@@ -1171,6 +1171,16 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 400036, guid: 8eb8f3b828e9ddd4c8182266a52bccff,
     type: 3}
   m_PrefabInternal: {fileID: 284906307}
+--- !u!4 &284906312 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 400112, guid: 8eb8f3b828e9ddd4c8182266a52bccff,
+    type: 3}
+  m_PrefabInternal: {fileID: 284906307}
+--- !u!4 &284906313 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 400114, guid: 8eb8f3b828e9ddd4c8182266a52bccff,
+    type: 3}
+  m_PrefabInternal: {fileID: 284906307}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -1445,16 +1455,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Hand_R: {fileID: 284906308}
   Hand_L: {fileID: 284906309}
-  initial_angle_RH: {x: 0, y: 0, z: 0}
-  initial_angle_LH: {x: 0, y: 0, z: 0}
   newY_angle_RH: 0
   newX_angle_RH: 0
   newZ_angle_RH: 0
   newY_angle_LH: 0
   newX_angle_LH: 0
   newZ_angle_LH: 0
-  initial_x_angle_RH: 0
-  initial_x_angle_LH: 0
   quaternionX_RH: 0
   quaternionY_RH: 0
   quaternionZ_RH: 0
@@ -1476,6 +1482,8 @@ MonoBehaviour:
   Hand_L: {fileID: 284906309}
   LowArm_R: {fileID: 284906311}
   LowArm_L: {fileID: 284906310}
+  UpArm_R: {fileID: 284906313}
+  UpArm_L: {fileID: 284906312}
   newY_angle_RH: 0
   newX_angle_RH: 0
   newZ_angle_RH: 0
@@ -1491,18 +1499,27 @@ MonoBehaviour:
   newY_angle_LLA: 0
   newX_angle_LLA: 0
   newZ_angle_LLA: 0
+  newY_angle_LUA: 0
+  newX_angle_LUA: 0
+  newZ_angle_LUA: 0
   quaternionX_RH: 0
   quaternionY_RH: 0
   quaternionZ_RH: 0
   quaternionX_RLA: 0
   quaternionY_RLA: 0
   quaternionZ_RLA: 0
+  quaternionX_RUA: 0
+  quaternionY_RUA: 0
+  quaternionZ_RUA: 0
   quaternionX_LH: 0
   quaternionY_LH: 0
   quaternionZ_LH: 0
   quaternionX_LLA: 0
   quaternionY_LLA: 0
   quaternionZ_LLA: 0
+  quaternionX_LUA: 0
+  quaternionY_LUA: 0
+  quaternionZ_LUA: 0
 --- !u!1 &1389390774
 GameObject:
   m_ObjectHideFlags: 0

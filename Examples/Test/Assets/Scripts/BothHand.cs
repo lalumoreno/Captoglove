@@ -21,9 +21,6 @@ public class BothHand : MonoBehaviour, ILoggerProvider {
 	public Transform   Hand_R;
 	public Transform   Hand_L;
 
-	public Vector3   initial_angle_RH;
-	public Vector3   initial_angle_LH;
-	
 	public float   newY_angle_RH;
 	public float   newX_angle_RH;
 	public float   newZ_angle_RH;
@@ -31,9 +28,6 @@ public class BothHand : MonoBehaviour, ILoggerProvider {
 	public float   newY_angle_LH;
 	public float   newX_angle_LH;
 	public float   newZ_angle_LH;
-	
-	public float   initial_x_angle_RH;
-	public float   initial_x_angle_LH;
 	
 	public float quaternionX_RH;
 	public float quaternionY_RH;
@@ -48,9 +42,6 @@ public class BothHand : MonoBehaviour, ILoggerProvider {
 		
 		Debug.Log("Start");
 		Debug.Log("Looking for peripheral");
-		
-		initial_angle_RH = Hand_R.localEulerAngles;
-		initial_angle_LH = Hand_L.localEulerAngles;
 		
         GSdkNet.BLE.Winapi.Package.LoggerProvider = this;
         GSdkNet.Carrier.Package.LoggerProvider = this;
@@ -204,33 +195,14 @@ public class BothHand : MonoBehaviour, ILoggerProvider {
 			quaternionY_RH  = float.Parse(oneValue[1]);		
 			quaternionZ_RH  = float.Parse(oneValue[2]);
 				
-				/* no limitations*/
-				/*
-				a=180f;
-				b=0f;				
+			/* no limitations*/
+			
+			a=180f;
+			b=90f;				
 				
-				newX_angle_RH = b + quaternionX*a;//pitch
-				newZ_angle_RH = -quaternionY*a;//yaw
-				newY_angle_RH = 90+quaternionZ*a;//roll
-				*/
-				
-				/*limitations not big difference*/
-				a=150f;
-				b=0f;				
-				
-				newX_angle_RH = b + quaternionX_RH*a;//pitch
-				
-				
-				a=120f;
-				b=0f;				
-				
-				newZ_angle_RH = b-quaternionY_RH*a;//yaw
-				
-				a=168.75f;
-				b=78.75f;				
-				
-				newY_angle_RH = b+quaternionZ_RH*a;//roll
-				
+			newX_angle_RH = quaternionX_RH*a;	//pitch
+			newZ_angle_RH = -quaternionY_RH*a;	//yaw
+			newY_angle_RH = quaternionZ_RH*a + b;//roll	
 		}
     }
 	
@@ -262,13 +234,11 @@ public class BothHand : MonoBehaviour, ILoggerProvider {
 			/* no limitations*/
 				
 			a=180f;
-			b=0f;				
+			b=90f;				
 				
-			newX_angle_LH = b - quaternionX_LH*a;//pitch
-			newZ_angle_LH = quaternionY_LH*a;//yaw
-			newY_angle_LH = -90+quaternionZ_LH*a;//roll
-			
-				
+			newX_angle_LH = -quaternionX_LH*a;	//pitch
+			newZ_angle_LH = quaternionY_LH*a;	//yaw
+			newY_angle_LH = quaternionZ_LH*a - b;//roll				
 		}
     }
 	
