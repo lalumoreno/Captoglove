@@ -1,4 +1,4 @@
-using GSdkNet.Base.Board;
+﻿using GSdkNet.Base.Board;
 using GSdkNet.Base.Core;
 using GSdkNet.Base.Peripheral;
 using GSdkNet.Carrier;
@@ -12,7 +12,7 @@ using System.Linq;
 using System.IO;
 
 
-public class BothArms : MonoBehaviour, ILoggerProvider {
+public class BothArmsFinger : MonoBehaviour, ILoggerProvider {
 
 	private IPeripheralCentral Central;
     private IBoardPeripheral Peripheral_RH;
@@ -26,6 +26,7 @@ public class BothArms : MonoBehaviour, ILoggerProvider {
 	public Transform   LowArm_L;
 	public Transform   UpArm_R;
 	public Transform   UpArm_L;
+	public Transform[] Fingers_L;
 	
 	public float   newY_angle_RH;
 	public float   newX_angle_RH;
@@ -51,6 +52,21 @@ public class BothArms : MonoBehaviour, ILoggerProvider {
 	public float   newX_angle_LUA;
 	public float   newZ_angle_LUA;
 	
+	/* fingers*/
+	public float[] newXPox_L;//newX_angle_LF;
+	public float[] newYPox_L;//newY_angle_LF;
+	public float[] newZPox_L;//newZ_angle_LF;
+	public float[] prevSensorVal_L;
+	public float[] refValue_L;
+	public Vector3[] temp_L;
+	public float pinkyLVal;	
+	public float ringLVal;	
+	public float middLVal;
+	public float idxLVal;
+	public float thumbLVal;
+	public float[] stableXPos_L;			
+	/****/			
+	
 	public float quaternionX_RH;
 	public float quaternionY_RH;
 	public float quaternionZ_RH;
@@ -70,6 +86,7 @@ public class BothArms : MonoBehaviour, ILoggerProvider {
 	
 	// Use this for initialization
 	void Start () {
+		
 		/*
 		Initial position
 		*/
@@ -89,6 +106,36 @@ public class BothArms : MonoBehaviour, ILoggerProvider {
 		newX_angle_LUA = 80;
 		newY_angle_LUA = 180;
 		newZ_angle_LUA = 180;
+		
+		
+		// Left Hand 
+		refValue_L[0] = 6460.342f;		//pL1
+		refValue_L[1] = refValue_L[0];	//pL2
+		refValue_L[2] = refValue_L[0];	//pL3
+		
+		refValue_L[3] = 5723.545f;		//rL1
+		refValue_L[4] = refValue_L[3]; 	//rL2
+		refValue_L[5] = refValue_L[3]; 	//rL3
+		
+		refValue_L[6] = 4545.418f; 		//mL1
+		refValue_L[7] = refValue_L[6]; 	//mL2
+		refValue_L[8] = refValue_L[6]; 	//mL3
+		
+		refValue_L[9] = 6587.761f;		//iL1
+		refValue_L[10] = refValue_L[9];	//iL2
+		refValue_L[11] = refValue_L[9];	//iL2
+		
+		refValue_L[12] = 5525.823f;		//tL1
+		refValue_L[13] = refValue_L[12];//tL2
+		refValue_L[14] = refValue_L[12];//tL3
+		
+		for(int i =0 ; i<14; i++)
+		{
+			temp_L[i] = Fingers_L[i].localEulerAngles;		
+			newXPox_L[i] = 0;
+			stableXPos_L[i] = temp_L[i].x;
+			prevSensorVal_L[i] = refValue_L[i];
+		}
 		
 		/*---------------------*/		
 		
@@ -128,6 +175,13 @@ public class BothArms : MonoBehaviour, ILoggerProvider {
 		//Up Arms 
 		UpArm_L.transform.localEulerAngles = new Vector3(newX_angle_LUA, newY_angle_LUA, newZ_angle_LUA);
 		UpArm_R.transform.localEulerAngles = new Vector3(newX_angle_RUA, newY_angle_RUA, newZ_angle_RUA);
+		
+		for(int i = 0 ; i<14 ; i++)
+		{
+			Fingers_L[i].transform.localEulerAngles = new Vector3(newXPox_L[i], temp_L[i].y, temp_L[i].z);			
+		}
+		
+		
 	}
 	
 	
@@ -268,6 +322,7 @@ public class BothArms : MonoBehaviour, ILoggerProvider {
 				Debug.Log("--- Set timeslot");
 				StreamTimeslots st = new StreamTimeslots(); 
 				st.Set(1, BoardStreamType.TaredQuaternion);
+				st.Set(1, BoardStreamType.SensorsState);
 				await Peripheral_LH.StreamTimeslots.WriteAsync(st);				
 				await Peripheral_LH.StreamTimeslots.ReadAsync();
             }
@@ -405,6 +460,8 @@ public class BothArms : MonoBehaviour, ILoggerProvider {
 	
 		float a;
 		float b;
+		float marg;
+		float ref3;
 		
 		if (e.StreamType == BoardStreamType.TaredQuaternion) {
             var args = e as BoardQuaternionEventArgs;
@@ -455,7 +512,176 @@ public class BothArms : MonoBehaviour, ILoggerProvider {
 			
 				
 		}
-    }
+		
+		if (e.StreamType == BoardStreamType.SensorsState) {
+		
+			var args = e as BoardFloatSequenceEventArgs;
+            var value = FloatsToString(args.Value);
+			List<string> oneValue = value.Split(',').ToList<string>();
+			
+			Debug.Log("Received sensors state: " + value);
+			//oneValue.Reverse(); // For right hand 
+
+			pinkyLVal = float.Parse(oneValue[1]);	
+			ringLVal  = float.Parse(oneValue[2]);//according with configuration	
+			middLVal  = float.Parse(oneValue[5]);
+			idxLVal   = float.Parse(oneValue[7]);
+			thumbLVal = float.Parse(oneValue[9]);
+			
+			a = 0;
+			b = 0;
+			marg = 20f;
+			ref3 =1260.854f; //To move third 
+			
+			if (pinkyLVal < (prevSensorVal_L[0] - marg) || pinkyLVal > (prevSensorVal_L[0] + marg))
+			{
+				a=-0.013914178f;
+				b= 89.89034793f;
+				
+				// 2
+				newXPox_L[0] = b + pinkyLVal*a;
+				
+				if (newXPox_L[0] < 0)
+					newXPox_L[0] = 0;
+				
+				if(newXPox_L[0] > 80)
+					newXPox_L[0] = 80;
+				
+				prevSensorVal_L[0] = pinkyLVal;
+				
+				newXPox_L[1] = newXPox_L[0];
+				
+				if(pinkyLVal<ref3)
+					newXPox_L[2] = newXPox_L[0];
+				else
+					newXPox_L[2] = stableXPos_L[2];
+				
+			}
+			
+			if (ringLVal < (prevSensorVal_L[3] - marg) || ringLVal > (prevSensorVal_L[3] + marg))
+			{
+				a=-0.013977351f;
+				b= 80f;
+				
+				newXPox_L[3] = b + ringLVal*a;
+				
+				if (newXPox_L[3] < 0)
+					newXPox_L[3] = 0;
+				
+				if(newXPox_L[3] > 80)
+					newXPox_L[3] = 80;
+				
+				prevSensorVal_L[3] = ringLVal;	
+
+				newXPox_L[4] = newXPox_L[3];
+
+				if(ringLVal<ref3)
+					newXPox_L[5] = newXPox_L[3];
+				else
+					newXPox_L[5] = stableXPos_L[5];				
+			}
+			
+			if (middLVal < (prevSensorVal_L[6] - marg) || middLVal > (prevSensorVal_L[6] + marg))
+			{
+				a=-0.017600142f;
+				b= 80f;
+				
+				newXPox_L[6] = b + middLVal*a;
+				
+				if (newXPox_L[6]<0)
+					newXPox_L[6] = 0;
+				
+				if(newXPox_L[6] > 80)
+					newXPox_L[6] = 80;
+				
+				prevSensorVal_L[6] = middLVal;	
+
+				newXPox_L[7] = newXPox_L[6];				
+				
+				if(middLVal<ref3)
+					newXPox_L[8] = newXPox_L[6];
+				else
+					newXPox_L[8] = stableXPos_L[8];
+			}
+			
+			if (idxLVal < (prevSensorVal_L[9] - marg) || idxLVal > (prevSensorVal_L[9] + marg))
+			{
+				a=-0.012484317f;
+				b= 82.24369514f;
+				
+				newXPox_L[9] = b + idxLVal*a;
+				
+				if (newXPox_L[9]<0)
+					newXPox_L[9] = 0;
+				
+				if(newXPox_L[9] > 80)
+					newXPox_L[9] = 80;
+								
+				prevSensorVal_L[9] = idxLVal;
+				
+				newXPox_L[10] = newXPox_L[9];
+				
+				if(idxLVal<ref3)
+					newXPox_L[11] = newXPox_L[9];
+				else
+					newXPox_L[11] = stableXPos_L[11];
+			}
+			
+			if (thumbLVal < (prevSensorVal_L[12] - marg) || thumbLVal > (prevSensorVal_L[12] + marg))
+			{
+				// 1
+				a=-0.008761211f;
+				b=38.41290115f;
+				
+				newXPox_L[12] = b + thumbLVal*a;
+				
+				if(newXPox_L[12] < -10)
+					newXPox_L[12] = -10;
+				 
+				if(newXPox_L[12] > 30)
+					newXPox_L[12] = 30;
+				
+				prevSensorVal_L[12] = thumbLVal;
+
+				// 2
+				a=-0.010951514f;
+				b=60.51612644f;
+				
+				newXPox_L[13] = b + thumbLVal*a;
+				
+				if(newXPox_L[13] < -0)
+					newXPox_L[13] = 0;
+				 
+				if(newXPox_L[13] > 50)
+					newXPox_L[13] = 50;
+				
+				prevSensorVal_L[13] = thumbLVal;
+				
+				if(thumbLVal<3444.49f)
+				{
+					// 3
+					a=-0.006570908f;
+					b=36.30967587f;
+				
+					newXPox_L[14] = b + thumbLVal*a;
+				
+					if(newXPox_L[14] < -0)
+						newXPox_L[14] = 0;
+				 
+					if(newXPox_L[14] > 30)
+						newXPox_L[14] = 30;
+				
+					prevSensorVal_L[14] = thumbLVal;
+				}
+				else
+					newXPox_L[14] = stableXPos_L[14];				
+			}
+			
+		}
+	
+	}
+	
+	
 
 	private void Peripheral_StreamReceived_LLA(object sender, BoardStreamEventArgs e) {
 		
@@ -610,3 +836,4 @@ public class BothArms : MonoBehaviour, ILoggerProvider {
     }
 	
 }
+
