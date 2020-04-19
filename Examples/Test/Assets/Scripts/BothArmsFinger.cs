@@ -3,6 +3,7 @@ using GSdkNet.Base.Core;
 using GSdkNet.Base.Peripheral;
 using GSdkNet.Carrier;
 using GSdkNet.BLE.Winapi;
+
 using UnityEngine;
 using System.ComponentModel;
 using System;
@@ -329,7 +330,7 @@ public class BothArmsFinger : MonoBehaviour, ILoggerProvider {
                 Peripheral_RH.PropertyChanged += Peripheral_PropertyChanged_RH;
                 await Peripheral_RH.StartAsync();
 				} //Left Hand
-				else if (board.Name == "CaptoGlove2480"){
+				else if (board.Name == "CaptoGlove2492"){
 				Peripheral_LH = board;
                 Peripheral_LH.StreamReceived += Peripheral_StreamReceived_LH;
                 Peripheral_LH.PropertyChanged += Peripheral_PropertyChanged_LH;
@@ -739,6 +740,7 @@ public class BothArmsFinger : MonoBehaviour, ILoggerProvider {
             Debug.Log("Received tared quaternion: " + args.Value);
 			
 			var value =  args.Value.ToString();			
+			Debug.Log("Received tared quaternion value: " + value);
 			var charsToRemove = new string[] { "(", ")" };
 			foreach (var c in charsToRemove)
 			{
@@ -746,10 +748,22 @@ public class BothArmsFinger : MonoBehaviour, ILoggerProvider {
 			}		
 
 			List<string> oneValue = value.Split(',').ToList<string>();
-				
+			
+			//for FW 192
+			string s1 = oneValue[0] + "," + oneValue[1];
+			string s2 = oneValue[2] + "," + oneValue[3];
+			string s3 = oneValue[4] + "," + oneValue[5];
+			
+			quaternionX_LH  = float.Parse(s1);	
+			quaternionY_LH  = float.Parse(s2);		
+			quaternionZ_LH  = float.Parse(s3);
+			
+			/////////////
+			/*
 			quaternionX_LH  = float.Parse(oneValue[0]);	
 			quaternionY_LH  = float.Parse(oneValue[1]);		
 			quaternionZ_LH  = float.Parse(oneValue[2]);
+				*/
 				
 			/* no limitations*/
 				
