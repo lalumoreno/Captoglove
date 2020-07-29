@@ -1,0 +1,18 @@
+Read board finger setup, it is 
+
+(Info = (Tag = 0, Min = 0, Max = 0, Hyst. = 1, ConfTime = 0.12, FilterFactor = 0.4)), 
+//Pinky
+(Info = (Tag = 0, Min = 710.8108, Max = 5974.839, Hyst. = 1, ConfTime = 0.12, FilterFactor = 0.4)), 
+(Info = (Tag = 0, Min = 0, Max = 0, Hyst. = 1, ConfTime = 0.12, FilterFactor = 0.4)), 
+//Ring
+(Info = (Tag = 0, Min = 0, Max = 8315184, Hyst. = 1, ConfTime = 0.12, FilterFactor = 0.4))
+(Info = (Tag = 0, Min = 0, Max = 0, Hyst. = 1, ConfTime = 0.12, FilterFactor = 0.4)), 
+//Middle
+(Info = (Tag = 0, Min = 0, Max = 3063.593, Hyst. = 1, ConfTime = 0.12, FilterFactor = 0.4)),
+(Info = (Tag = 0, Min = 0, Max = 0, Hyst. = 1, ConfTime = 0.12, FilterFactor = 0.4)), 
+//Index
+(Info = (Tag = 0, Min = 179.7211, Max = 4653.209, Hyst. = 1, ConfTime = 0.12, FilterFactor = 0.4), Triggers = (IsEnabled = True, Target = Mouse, Limit = 0, MinValue = -1024, MaxValue = 0, Keys = System.Int16[])), 
+//Thumb preasure
+(Info = (Tag = 0, Min = 0, Max = 78703.08, Hyst. = 1, ConfTime = 0.12, FilterFactor = 0.4)), 
+//thumb band
+(Info = (Tag = 0, Min = 960.2441, Max = 3567.74, Hyst. = 1, ConfTime = 0.12, FilterFactor = 0.4), Triggers = (IsEnabled = True, Target = Mouse, Limit = 0, MinValue = -1024, MaxValue = 0.01, Keys = System.Int16[]))

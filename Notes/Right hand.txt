@@ -1,0 +1,78 @@
+//Right HAND!!
+
+//Thum band
+(Info = (Tag = 0, Min = 1391.7, Max = 2672.114, Hyst. = 1, ConfTime = 0.12, FilterFactor = 0.4)),
+//Thumbpreasure
+(Info = (Tag = 0, Min = 0, Max = 85431.38, Hyst. = 1, ConfTime = 0.12, FilterFactor = 0.4)), 
+// Index
+(Info = (Tag = 0, Min = 86.23113, Max = 3377.868, Hyst. = 1, ConfTime = 0.12, FilterFactor = 0.4)), 
+(Info = (Tag = 0, Min = 1.027721, Max = 1.027721, Hyst. = 1, ConfTime = 0.12, FilterFactor = 0.4)), 
+//Middle
+(Info = (Tag = 0, Min = 125.4656, Max = 5928.343, Hyst. = 1, ConfTime = 0.12, FilterFactor = 0.4)), 
+(Info = (Tag = 0, Min = 0, Max = 0, Hyst. = 1, ConfTime = 0.12, FilterFactor = 0.4)), 
+//Ring
+(Info = (Tag = 0, Min = 500.1178, Max = 5547.451, Hyst. = 1, ConfTime = 0.12, FilterFactor = 0.4)), 
+(Info = (Tag = 0, Min = 0, Max = 0, Hyst. = 1, ConfTime = 0.12, FilterFactor = 0.4)), 
+//Pinky
+(Info = (Tag = 0, Min = 58.80452, Max = 3364.699, Hyst. = 1, ConfTime = 0.12, FilterFactor = 0.4)), 
+(Info = (Tag = 0, Min = 0, Max = 0, Hyst. = 1, ConfTime = 0.12, FilterFactor = 0.4))
+
+
+Not all falages closed:
+
+L p 1698.499
+L r 1026.175
+L m 1071.23
+L i 1247.512
+L t 3444.49
+
+NAme
+
+- Name: CaptoGlove2480
+
+
+//Magnometro
+mano boca abajo plana
+Girando mano hacia arriba y abajo 
+										x			y		z
+
+Decoded vector CalibratedMagnetism: (22.1578, -17.3264, 23.5739)
+apuntando hacia arrib alos dedos 
+Decoded vector CalibratedMagnetism: (-10.9956, 10.4125, 21.7413)
+apuntado los dedos hacia abajo
+Decoded vector CalibratedMagnetism: (15.4938, -83.3833, -39.3176)
+Decoded vector CalibratedMagnetism: (13.5779, -81.2175, -37.6516)
+Decoded vector CalibratedMagnetism: (16.4101, -90.3805, -24.2403)
+
+//Girar hacia la derecha 
+
+
+
+-- sobre meñique 
+Decoded vector CalibratedMagnetism: (-115.1206, 3.8318, 36.2355)
+Decoded vector CalibratedMagnetism: (-117.9528, -0.4165, 34.7361)
+Decoded vector CalibratedMagnetism: (-119.5355, -1.2495, 34.986)
+
+
+
+180 grados
+Decoded vector CalibratedMagnetism: (85.2159, -22.5743, 41.2335)
+Decoded vector CalibratedMagnetism: (83.8831, -17.5763, 43.0661)
+Decoded vector CalibratedMagnetism: (84.3829, -20.5751, 44.3156)
+
+
+-- sobre gordo
+Decoded vector CalibratedMagnetism: (40.9003, -6.4141, 37.485)
+Decoded vector CalibratedMagnetism: (38.318, -10.9956, 40.4005)
+Decoded vector CalibratedMagnetism: (40.6504, -13.1614, 39.3176)
+
+
+
+Totalmente levantada la mano 
+Decoded vector CalibratedMagnetism: (3.1654, 49.2303, -2.5823)
+Decoded vector CalibratedMagnetism: (6.4141, 52.0625, -4.2483)
+Decoded vector CalibratedMagnetism: (9.6628, 51.646, -3.5819)
+Decoded vector CalibratedMagnetism: (9.4129, 50.0633, -1.7493)
+
+
+ 
