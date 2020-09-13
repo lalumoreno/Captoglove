@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("_no",["Variable"],[["_nOmittedDegrees",,[["MyHand",,,,0,"File:MyHand.cs:MyHand._nOmittedDegrees","CSharpClass:MyHand:_nOmittedDegrees"]]]]);

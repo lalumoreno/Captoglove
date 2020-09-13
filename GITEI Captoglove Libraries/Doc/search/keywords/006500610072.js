@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("ear",["Enumeration"],[["eArmType",,[["MyArm",,,,0,"File:MyArm.cs:MyArm.eArmType","CSharpClass:MyArm:eArmType"]]]]);

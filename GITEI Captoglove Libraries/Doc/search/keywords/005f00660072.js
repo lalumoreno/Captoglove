@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("_fr",["Variable"],[["_fRollVarA",,[["MyHand",,,,0,"File:MyHand.cs:MyHand._fRollVarA","CSharpClass:MyHand:_fRollVarA"]]],["_fRollVarB",,[["MyHand",,,,0,"File:MyHand.cs:MyHand._fRollVarB","CSharpClass:MyHand:_fRollVarB"]]]]);

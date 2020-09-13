@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("_np",["Variable"],[["_nPinkyPos",,[["MyHand",,,,0,"File:MyHand.cs:MyHand._nPinkyPos","CSharpClass:MyHand:_nPinkyPos"]]],["_nPressurePos",,[["MyHand",,,,0,"File:MyHand.cs:MyHand._nPressurePos","CSharpClass:MyHand:_nPressurePos"]]]]);

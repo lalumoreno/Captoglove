@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("iss",["Function"],[["IsSensorPressed",,[["MyHand",,,,0,"File:MyHand.cs:MyHand.IsSensorPressed","CSharpClass:MyHand:IsSensorPressed"]]]]);

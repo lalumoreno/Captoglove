@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("pfa",["Variable"],[["pfaFingerSensorMaxValue",,[["Module",,,,0,"File:Module.cs:Module.pfaFingerSensorMaxValue","CSharpClass:Module:pfaFingerSensorMaxValue"]]],["pfaFingerSensorMinValue",,[["Module",,,,0,"File:Module.cs:Module.pfaFingerSensorMinValue","CSharpClass:Module:pfaFingerSensorMinValue"]]]]);

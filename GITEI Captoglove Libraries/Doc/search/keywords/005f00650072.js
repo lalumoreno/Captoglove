@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("_er",["Variable"],[["_eRollAxis",,[["MyArm",,,,0,"File:MyArm.cs:MyArm._eRollAxis","CSharpClass:MyArm:_eRollAxis"],["MyHand",,,,0,"File:MyHand.cs:MyHand._eRollAxis","CSharpClass:MyHand:_eRollAxis"]]]]);

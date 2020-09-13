@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("eha",["Enumeration"],[["eHandType",,[["MyHand",,,,0,"File:MyHand.cs:MyHand.eHandType","CSharpClass:MyHand:eHandType"]]]]);

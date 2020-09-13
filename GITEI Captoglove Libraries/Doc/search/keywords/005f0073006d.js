@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("_sm",["Variable"],[["_sModuleName",,[["Module",,,,0,"File:Module.cs:Module._sModuleName","CSharpClass:Module:_sModuleName"]]]]);

@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("_nr",["Variable"],[["_nRingPos",,[["MyHand",,,,0,"File:MyHand.cs:MyHand._nRingPos","CSharpClass:MyHand:_nRingPos"]]]]);

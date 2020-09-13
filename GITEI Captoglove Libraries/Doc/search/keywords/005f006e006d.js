@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("_nm",["Variable"],[["_nMiddlePos",,[["MyHand",,,,0,"File:MyHand.cs:MyHand._nMiddlePos","CSharpClass:MyHand:_nMiddlePos"]]],["_nModuleID",,[["Module",,,,0,"File:Module.cs:Module._nModuleID","CSharpClass:Module:_nModuleID"]]]]);

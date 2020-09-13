@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("asi",["Function"],[["AsignAngle2Axes",,[["MyArm",,,,0,"File:MyArm.cs:MyArm.AsignAngle2Axes","CSharpClass:MyArm:AsignAngle2Axes"],["MyHand",,,,0,"File:MyHand.cs:MyHand.AsignAngle2Axes","CSharpClass:MyHand:AsignAngle2Axes"]]]]);

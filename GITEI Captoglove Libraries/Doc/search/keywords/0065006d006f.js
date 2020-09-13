@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("emo",["Enumeration"],[["eModuleAxis",,[["Module",,,,0,"File:Module.cs:Module.eModuleAxis","CSharpClass:Module:eModuleAxis"]]]]);

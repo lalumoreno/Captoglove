@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("dis",["Function"],[["DisableLog",,[["Module",,,,0,"File:Module.cs:Module.DisableLog","CSharpClass:Module:DisableLog"]]]]);

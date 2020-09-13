@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("per",["Function"],[["Peripheral_PropertyChanged",,[["Module",,,,0,"File:Module.cs:Module.Peripheral_PropertyChanged","CSharpClass:Module:Peripheral_PropertyChanged"]]],["Peripheral_StreamReceived",,[["Module",,,,0,"File:Module.cs:Module.Peripheral_StreamReceived","CSharpClass:Module:Peripheral_StreamReceived"]]]]);
