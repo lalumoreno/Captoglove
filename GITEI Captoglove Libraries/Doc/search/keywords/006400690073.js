@@ -1,1 +1,1 @@
-NDSearch.OnPrefixDataLoaded("dis",["Function"],[["DisableLog",,[["Module",,,,0,"File:Module.cs:Module.DisableLog","CSharpClass:Module:DisableLog"]]]]);
+NDSearch.OnPrefixDataLoaded("dis",["Function"],[["DisableLog",,[["GITEICaptoglove.Module",,,,0,"File:Module.cs:GITEICaptoglove.Module.DisableLog","CSharpClass:GITEICaptoglove.Module:DisableLog"]]]]);

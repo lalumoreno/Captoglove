@@ -1,1 +1,1 @@
-NDSearch.OnPrefixDataLoaded("ena",["Function"],[["EnableLog",,[["Module",,,,0,"File:Module.cs:Module.EnableLog","CSharpClass:Module:EnableLog"]]]]);
+NDSearch.OnPrefixDataLoaded("ena",["Function"],[["EnableLog",,[["GITEICaptoglove.Module",,,,0,"File:Module.cs:GITEICaptoglove.Module.EnableLog","CSharpClass:GITEICaptoglove.Module:EnableLog"]]]]);

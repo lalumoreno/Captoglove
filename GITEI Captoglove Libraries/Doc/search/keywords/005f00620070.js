@@ -1,1 +1,1 @@
-NDSearch.OnPrefixDataLoaded("_bp",["Variable"],[["_bPropertiesRead",,[["Module",,,,0,"File:Module.cs:Module._bPropertiesRead","CSharpClass:Module:_bPropertiesRead"]]]]);
+NDSearch.OnPrefixDataLoaded("_bp",["Variable"],[["_bPropertiesRead",,[["GITEICaptoglove.Module",,,,0,"File:Module.cs:GITEICaptoglove.Module._bPropertiesRead","CSharpClass:GITEICaptoglove.Module:_bPropertiesRead"]]]]);

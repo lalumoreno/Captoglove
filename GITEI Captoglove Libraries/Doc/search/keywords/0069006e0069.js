@@ -1,1 +1,1 @@
-NDSearch.OnPrefixDataLoaded("ini",["Function"],[["InitModule",,[["Module",,,,0,"File:Module.cs:Module.InitModule","CSharpClass:Module:InitModule"]]]]);
+NDSearch.OnPrefixDataLoaded("ini",["Function"],[["InitModule",,[["GITEICaptoglove.Module",,,,0,"File:Module.cs:GITEICaptoglove.Module.InitModule","CSharpClass:GITEICaptoglove.Module:InitModule"]]]]);

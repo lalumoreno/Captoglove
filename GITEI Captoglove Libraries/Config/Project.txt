@@ -43,7 +43,7 @@ Title: GITEI Captoglove Libraries
 # Source Code
 # ------------------------------------------------------------------------
 
-Source Folder: ..
+Source Folder: ..\GITEICaptoglove
 
 
 

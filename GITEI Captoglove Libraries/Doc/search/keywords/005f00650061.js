@@ -1,1 +1,1 @@
-NDSearch.OnPrefixDataLoaded("_ea",["Variable"],[["_eArmType",,[["MyArm",,,,0,"File:MyArm.cs:MyArm._eArmType","CSharpClass:MyArm:_eArmType"]]]]);
+NDSearch.OnPrefixDataLoaded("_ea",["Variable"],[["_eArmType",,[["GITEICaptoglove.MyArm",,,,0,"File:MyArm.cs:GITEICaptoglove.MyArm._eArmType","CSharpClass:GITEICaptoglove.MyArm:_eArmType"]]]]);

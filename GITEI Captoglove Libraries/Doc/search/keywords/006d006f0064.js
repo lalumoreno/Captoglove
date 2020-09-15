@@ -1,1 +1,1 @@
-NDSearch.OnPrefixDataLoaded("mod",["Class"],[["Module",,[[,,,,0,"File:Module.cs:Module","CSharpClass:Module"]]]]);
+NDSearch.OnPrefixDataLoaded("mod",["Class"],[["Module",,[["GITEICaptoglove",,,,0,"File:Module.cs:GITEICaptoglove.Module","CSharpClass:GITEICaptoglove.Module"]]]]);

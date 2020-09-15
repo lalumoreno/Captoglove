@@ -1,1 +1,1 @@
-NDSearch.OnPrefixDataLoaded("_bf",["Variable"],[["_bFingerVariablesSet",,[["MyHand",,,,0,"File:MyHand.cs:MyHand._bFingerVariablesSet","CSharpClass:MyHand:_bFingerVariablesSet"]]]]);
+NDSearch.OnPrefixDataLoaded("_bf",["Variable"],[["_bFingerVariablesSet",,[["GITEICaptoglove.MyHand",,,,0,"File:MyHand.cs:GITEICaptoglove.MyHand._bFingerVariablesSet","CSharpClass:GITEICaptoglove.MyHand:_bFingerVariablesSet"]]]]);

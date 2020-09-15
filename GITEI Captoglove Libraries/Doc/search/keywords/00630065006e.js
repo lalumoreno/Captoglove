@@ -1,1 +1,1 @@
-NDSearch.OnPrefixDataLoaded("cen",["Function"],[["Central_PeripheralsChanged",,[["Module",,,,0,"File:Module.cs:Module.Central_PeripheralsChanged","CSharpClass:Module:Central_PeripheralsChanged"]]]]);
+NDSearch.OnPrefixDataLoaded("cen",["Function"],[["Central_PeripheralsChanged",,[["GITEICaptoglove.Module",,,,0,"File:Module.cs:GITEICaptoglove.Module.Central_PeripheralsChanged","CSharpClass:GITEICaptoglove.Module:Central_PeripheralsChanged"]]]]);

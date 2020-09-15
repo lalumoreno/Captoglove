@@ -1,1 +1,1 @@
-NDSearch.OnPrefixDataLoaded("pem",["Enumeration"],[["peModuleType",,[["Module",,,,0,"File:Module.cs:Module.peModuleType","CSharpClass:Module:peModuleType"]]]]);
+NDSearch.OnPrefixDataLoaded("pem",["Enumeration"],[["peModuleType",,[["GITEICaptoglove.Module",,,,0,"File:Module.cs:GITEICaptoglove.Module.peModuleType","CSharpClass:GITEICaptoglove.Module:peModuleType"]]]]);

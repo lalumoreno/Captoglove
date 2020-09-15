@@ -1,1 +1,1 @@
-NDSearch.OnPrefixDataLoaded("emo",["Enumeration"],[["eModuleAxis",,[["Module",,,,0,"File:Module.cs:Module.eModuleAxis","CSharpClass:Module:eModuleAxis"]]]]);
+NDSearch.OnPrefixDataLoaded("emo",["Enumeration"],[["eModuleAxis",,[["GITEICaptoglove.Module",,,,0,"File:Module.cs:GITEICaptoglove.Module.eModuleAxis","CSharpClass:GITEICaptoglove.Module:eModuleAxis"]]]]);

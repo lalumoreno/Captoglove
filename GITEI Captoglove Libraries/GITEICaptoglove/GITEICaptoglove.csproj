@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="GSdkNet">
+      <HintPath>..\..\SDK\GsdkNet_1.3.0\GsdkNet_1.3.0\Unity\Examples\CaptoGlove\Assets\Plugins\GSdkNet.dll</HintPath>
+    </Reference>
+    <Reference Include="GSdkNet.BLE.Winapi">
+      <HintPath>..\..\SDK\GsdkNet_1.3.0\GsdkNet_1.3.0\Unity\Examples\CaptoGlove\Assets\Plugins\GSdkNet.BLE.Winapi.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>..\..\..\..\..\..\..\..\Program Files\Unity\Editor\Data\Managed\UnityEngine\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>..\..\..\..\..\..\..\..\Program Files\Unity\Editor\Data\Managed\UnityEngine\UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

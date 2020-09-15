@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("swf",["Variable"],[["swFingerWriter",,[["GITEICaptoglove.MyHand",,,,0,"File:MyHand.cs:GITEICaptoglove.MyHand.swFingerWriter","CSharpClass:GITEICaptoglove.MyHand:swFingerWriter"]]]]);

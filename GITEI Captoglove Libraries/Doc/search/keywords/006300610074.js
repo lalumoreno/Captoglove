@@ -1,1 +1,0 @@
-NDSearch.OnPrefixDataLoaded("cat",["Function"],[["CatchObject",,[["MyHand",,,,0,"File:MyHand.cs:MyHand.CatchObject","CSharpClass:MyHand:CatchObject"]]]]);

@@ -1,1 +1,1 @@
-NDSearch.OnPrefixDataLoaded("_nr",["Variable"],[["_nRingPos",,[["MyHand",,,,0,"File:MyHand.cs:MyHand._nRingPos","CSharpClass:MyHand:_nRingPos"]]]]);
+NDSearch.OnPrefixDataLoaded("_nr",["Variable"],[["_nRingPos",,[["GITEICaptoglove.MyHand",,,,0,"File:MyHand.cs:GITEICaptoglove.MyHand._nRingPos","CSharpClass:GITEICaptoglove.MyHand:_nRingPos"]]]]);

@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("swh",["Variable"],[["swHandWriter",,[["GITEICaptoglove.MyHand",,,,0,"File:MyHand.cs:GITEICaptoglove.MyHand.swHandWriter","CSharpClass:GITEICaptoglove.MyHand:swHandWriter"]]]]);
