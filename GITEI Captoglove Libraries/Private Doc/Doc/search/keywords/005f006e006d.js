@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("_nm",["Variable"],[["_nMiddlePos",,[["GITEICaptoglove.MyHand",,,,0,"File:MyHand.cs:GITEICaptoglove.MyHand._nMiddlePos","CSharpClass:GITEICaptoglove.MyHand:_nMiddlePos"]]],["_nModuleID",,[["GITEICaptoglove.Module",,,,0,"File:Module.cs:GITEICaptoglove.Module._nModuleID","CSharpClass:GITEICaptoglove.Module:_nModuleID"]]]]);

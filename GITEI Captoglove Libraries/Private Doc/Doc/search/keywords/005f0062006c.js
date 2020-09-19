@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("_bl",["Variable"],[["_bLogEnabled",,[["GITEICaptoglove.Module",,,,0,"File:Module.cs:GITEICaptoglove.Module._bLogEnabled","CSharpClass:GITEICaptoglove.Module:_bLogEnabled"]]]]);

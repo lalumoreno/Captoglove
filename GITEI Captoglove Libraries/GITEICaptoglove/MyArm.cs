@@ -7,6 +7,12 @@ namespace GITEICaptoglove
     /* 
         Class: MyArm
         Handles Captoglove module configured as forearm sensor.
+
+    	Author: 
+		Laura Moreno - laamorenoro@unal.edu.co 
+		
+		Copyrigth:		
+		Copyrigth 2020 GITEI Universidad Nacional de Colombia, all rigths reserved. 	    
     */
     public class MyArm : Module
     {

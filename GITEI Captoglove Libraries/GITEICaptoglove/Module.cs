@@ -14,6 +14,12 @@ namespace GITEICaptoglove
     /* 
         Class: Module
         Handles Captoglove module. Used by MyHand and MyArm.
+    	
+        Author: 
+		Laura Moreno - laamorenoro@unal.edu.co 
+		
+		Copyrigth:		
+		Copyrigth 2020 GITEI Universidad Nacional de Colombia, all rigths reserved. 		    
     */
     public class Module
     {
@@ -270,7 +276,7 @@ namespace GITEICaptoglove
             true - Captoglove module properties have been read
             false - Captoglove module properties have NOT been read         
         */
-        protected bool GetPropertiesRead()
+        public bool GetPropertiesRead()
         {
             return _bPropertiesRead;
         }

@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("_ep",["Variable"],[["_ePitchAxis",,[["GITEICaptoglove.MyArm",,,,0,"File:MyArm.cs:GITEICaptoglove.MyArm._ePitchAxis","CSharpClass:GITEICaptoglove.MyArm:_ePitchAxis"],["GITEICaptoglove.MyHand",,,,0,"File:MyHand.cs:GITEICaptoglove.MyHand._ePitchAxis","CSharpClass:GITEICaptoglove.MyHand:_ePitchAxis"]]]]);

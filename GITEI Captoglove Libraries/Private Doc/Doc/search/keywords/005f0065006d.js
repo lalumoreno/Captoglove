@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("_em",["Variable"],[["_eModuleType",,[["GITEICaptoglove.Module",,,,0,"File:Module.cs:GITEICaptoglove.Module._eModuleType","CSharpClass:GITEICaptoglove.Module:_eModuleType"]]]]);

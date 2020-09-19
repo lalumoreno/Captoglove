@@ -7,7 +7,14 @@ namespace GITEICaptoglove
     /* 
         Class: MyHand
         Handles Captoglove module configured as hand sensor.
-    */
+
+    	Author: 
+		Laura Moreno - laamorenoro@unal.edu.co 
+		
+		Copyrigth:		
+		Copyrigth 2020 GITEI Universidad Nacional de Colombia, all rigths reserved. 
+		
+    */    
     public class MyHand : Module
     {
         /* 
@@ -198,7 +205,7 @@ namespace GITEICaptoglove
             true - Finger algorithm has been created
             false - Finger algorithm has NOT been created
         */
-        public bool GetFingerAlgorithmReady()
+        private bool GetFingerAlgorithmReady()
         {
             return _bFingerVariablesSet;
         }
@@ -869,7 +876,7 @@ namespace GITEICaptoglove
                     SetFingerAlgorithm();
                     for (int i = 0; i < 10; i++)
                     {
-                        _faSensorTrigger[i] = (pfaFingerSensorMaxValue[i] - pfaFingerSensorMinValue[i]) / 3;
+                        _faSensorTrigger[i] = (pfaFingerSensorMaxValue[i] - pfaFingerSensorMinValue[i]) / 2;
                     }
                 }
 
@@ -885,8 +892,16 @@ namespace GITEICaptoglove
                         _vaFingerChild1Angle[i].x = args.Value[i] * _faFingerChild1VarA[i] + _faFingerChild1VarB[i];
                         _vaFingerChild2Angle[i].x = args.Value[i] * _faFingerChild2VarA[i] + _faFingerChild2VarB[i];
                     }
-
-                    if (Mathf.Abs(_vaFingerAngle[i].x) < Mathf.Abs(_faFingerMinRotation[i]))
+                    
+                    if (GetHandtype() == eHandType.TYPE_RIGHT_HAND && 
+                        (_vaFingerAngle[i].x > _faFingerMinRotation[i]))                        
+                    {
+                        _vaFingerAngle[i].x = _faFingerMinRotation[i];
+                        _vaFingerChild1Angle[i].x = _faFingerChild1MinRotation[i];
+                        _vaFingerChild2Angle[i].x = _faFingerChild2MinRotation[i];
+                    }
+                    else if (GetHandtype() == eHandType.TYPE_LEFT_HAND &&
+                            (_vaFingerAngle[i].x < _faFingerMinRotation[i]))
                     {
                         _vaFingerAngle[i].x = _faFingerMinRotation[i];
                         _vaFingerChild1Angle[i].x = _faFingerChild1MinRotation[i];
@@ -936,6 +951,16 @@ namespace GITEICaptoglove
         public Vector3 GetHandPosition()
         {
             return _tHand.position;
+        }
+
+        /* 
+            Function: GetHandRotation
+            Returns:
+                Global euler angles of hand transform
+        */
+        public Vector3 GetHandRotation()
+        {
+            return _tHand.eulerAngles;
         }
 
         /* 
