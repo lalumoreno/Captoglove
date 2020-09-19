@@ -1,1 +1,0 @@
-NDSearch.OnPrefixDataLoaded("_no",["Variable"],[["_nOmittedDegrees",,[["GITEICaptoglove.MyHand",,,,0,"File:MyHand.cs:GITEICaptoglove.MyHand._nOmittedDegrees","CSharpClass:GITEICaptoglove.MyHand:_nOmittedDegrees"]]]]);

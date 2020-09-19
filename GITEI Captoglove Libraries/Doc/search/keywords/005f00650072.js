@@ -1,1 +1,0 @@
-NDSearch.OnPrefixDataLoaded("_er",["Variable"],[["_eRollAxis",,[["GITEICaptoglove.MyArm",,,,0,"File:MyArm.cs:GITEICaptoglove.MyArm._eRollAxis","CSharpClass:GITEICaptoglove.MyArm:_eRollAxis"],["GITEICaptoglove.MyHand",,,,0,"File:MyHand.cs:GITEICaptoglove.MyHand._eRollAxis","CSharpClass:GITEICaptoglove.MyHand:_eRollAxis"]]]]);

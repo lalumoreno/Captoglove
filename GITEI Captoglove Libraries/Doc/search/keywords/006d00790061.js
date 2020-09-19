@@ -1,1 +1,0 @@
-NDSearch.OnPrefixDataLoaded("mya",["Class"],[["MyArm",,[["GITEICaptoglove",,,,0,"File:MyArm.cs:GITEICaptoglove.MyArm","CSharpClass:GITEICaptoglove.MyArm"]]]]);

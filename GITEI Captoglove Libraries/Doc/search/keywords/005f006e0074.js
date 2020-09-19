@@ -1,1 +1,0 @@
-NDSearch.OnPrefixDataLoaded("_nt",["Variable"],[["_nThumbPos",,[["GITEICaptoglove.MyHand",,,,0,"File:MyHand.cs:GITEICaptoglove.MyHand._nThumbPos","CSharpClass:GITEICaptoglove.MyHand:_nThumbPos"]]]]);

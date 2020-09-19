@@ -1,1 +1,0 @@
-NDSearch.OnPrefixDataLoaded("tra",["Function"],[["TraceLog",,[["GITEICaptoglove.Module",,,,0,"File:Module.cs:GITEICaptoglove.Module.TraceLog","CSharpClass:GITEICaptoglove.Module:TraceLog"]]]]);

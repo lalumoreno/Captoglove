@@ -1,1 +1,0 @@
-NDSearch.OnPrefixDataLoaded("ear",["Enumeration"],[["eArmType",,[["GITEICaptoglove.MyArm",,,,0,"File:MyArm.cs:GITEICaptoglove.MyArm.eArmType","CSharpClass:GITEICaptoglove.MyArm:eArmType"]]]]);

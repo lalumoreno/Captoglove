@@ -1,1 +1,0 @@
-NDSearch.OnPrefixDataLoaded("bha",["Variable"],[["bHandFile",,[["GITEICaptoglove.MyHand",,,,0,"File:MyHand.cs:GITEICaptoglove.MyHand.bHandFile","CSharpClass:GITEICaptoglove.MyHand:bHandFile"]]]]);
