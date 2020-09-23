@@ -631,7 +631,7 @@ namespace GITEICaptoglove
                     SetFingerAlgorithm();
                     for (int i = 0; i < 10; i++)
                     {
-                        _faSensorTrigger[i] = (pfaFingerSensorMaxValue[i] - pfaFingerSensorMinValue[i]) / 2;
+                        _faSensorTrigger[i] = (pfaFingerSensorMaxValue[i] - pfaFingerSensorMinValue[i]) / 3;
                     }
                 }
 
@@ -701,7 +701,10 @@ namespace GITEICaptoglove
         */
         public Vector3 GetHandPosition()
         {
-            return _tHand.position;
+            if (_tHand != null)
+                return _tHand.position;
+            else
+                return new Vector3(0, 0, 0);
         }
 
         /* 
@@ -711,7 +714,10 @@ namespace GITEICaptoglove
         */
         public Vector3 GetHandRotation()
         {
-            return _tHand.eulerAngles;
+            if (_tHand != null)
+                return _tHand.eulerAngles;
+            else
+                return new Vector3(0, 0, 0);
         }
 
         /* 
@@ -721,7 +727,10 @@ namespace GITEICaptoglove
         */
         public Vector3 GetThumbPosition()
         {
-            return _taFinger[_nThumbPos].position;
+            if (_taFinger[_nThumbPos] != null)
+                return _taFinger[_nThumbPos].position;
+            else
+                return new Vector3(0, 0, 0);
         }
 
         /* 
@@ -731,7 +740,10 @@ namespace GITEICaptoglove
         */
         public Vector3 GetIndexPosition()
         {
-            return _taFinger[_nIndexPos].position;
+            if (_taFinger[_nIndexPos] != null)
+                return _taFinger[_nIndexPos].position;
+            else
+                return new Vector3(0, 0, 0);
         }
 
         /* 
@@ -741,7 +753,10 @@ namespace GITEICaptoglove
         */
         public Vector3 GetMiddlePosition()
         {
-            return _taFinger[_nMiddlePos].position;
+            if (_taFinger[_nMiddlePos] != null)
+                return _taFinger[_nMiddlePos].position;
+            else
+                return new Vector3(0, 0, 0);
         }
 
         /* 
@@ -751,7 +766,10 @@ namespace GITEICaptoglove
         */
         public Vector3 GetRingPosition()
         {
-            return _taFinger[_nRingPos].position;
+            if (_taFinger[_nRingPos] != null)
+                return _taFinger[_nRingPos].position;
+            else
+                return new Vector3(0, 0, 0);
         }
 
         /* 
@@ -761,7 +779,10 @@ namespace GITEICaptoglove
         */
         public Vector3 GetPinkyPosition()
         {
-            return _taFinger[_nPinkyPos].position;
+            if (_taFinger[_nPinkyPos] != null)
+                return _taFinger[_nPinkyPos].position;
+            else
+                return new Vector3(0, 0, 0);
         }
 
         /* 

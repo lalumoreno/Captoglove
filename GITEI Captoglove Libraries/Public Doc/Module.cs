@@ -144,7 +144,13 @@ namespace GITEICaptoglove
             _bPropertiesRead = b;
         }
 
-        protected bool GetPropertiesRead()
+        /* 
+            Function: GetPropertiesRead
+            Returns:
+            true - Captoglove module properties have been read
+            false - Captoglove module properties have NOT been read         
+        */
+        public bool GetPropertiesRead()
         {
             return _bPropertiesRead;
         }
