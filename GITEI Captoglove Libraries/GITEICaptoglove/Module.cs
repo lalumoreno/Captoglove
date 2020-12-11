@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using UnityEngine;
 
+//SDK Captoglove
 using GSdkNet;
 using GSdkNet.BLE;
 using GSdkNet.Board;
@@ -19,21 +20,21 @@ namespace GITEICaptoglove
 		Laura Moreno - laamorenoro@unal.edu.co 
 		
 		Copyrigth:		
-		Copyrigth 2020 GITEI Universidad Nacional de Colombia, all rigths reserved. 		    
+		Copyrigth 2020 Universidad Nacional de Colombia, all rigths reserved. 		    
     */
     public class Module
     {
         /* 
             Group: Types
-            Enum: peModuleType
+            Enum: ModuleType
             List of possible ways to use Captoglove module:
 
             TYPE_RIGHT_HAND - As right hand sensor
             TYPE_LEFT_HAND - As left hand sensor
-            TYPE_RIGHT_ARM - As low right arm sensor
-            TYPE_LEFT_ARM - As low left arm sensor
+            TYPE_RIGHT_ARM - As right forearm sensor
+            TYPE_LEFT_ARM - As left forearm sensor
         */
-        protected enum peModuleType
+        protected enum ModuleType
         {
             TYPE_RIGHT_HAND,
             TYPE_LEFT_HAND,
@@ -42,39 +43,38 @@ namespace GITEICaptoglove
         }
 
         /* 
-            Enum: eModuleAxis
+            Enum: ModuleAxis
             List of axes:
 
             AXIS_X - X axis 
             AXIS_Y - Y axis
             AXIS_Z - Z axis
         */
-        public enum eModuleAxis
+        public enum ModuleAxis
         {
             AXIS_X,
             AXIS_Y,
             AXIS_Z
         }
 
-        private peModuleType _eModuleType = peModuleType.TYPE_RIGHT_HAND;
-
+        private ModuleType eModuleType  = ModuleType.TYPE_RIGHT_HAND;
         //Have Setters and Getters
-        private int _nModuleID = 0;
-        private string _sModuleName = " ";
-        private bool _bModuleInitialized = false;
-        private bool _bModuleStarted = false;
-        private bool _bPropertiesRead = false;
-        private bool _bLogEnabled = false;
+        private int nModuleID           = 0;
+        private string sModuleName      = " ";
+        private bool bModuleInitialized = false;
+        private bool bModuleStarted     = false;
+        private bool bPropertiesRead    = false;
+        private bool bLogEnabled        = false;
 
-        private IPeripheralCentral _IModuleCentral;
-        private IBoardPeripheral _IModuleBoard;
+        private IPeripheralCentral IModuleCentral;
+        private IBoardPeripheral IModuleBoard;
 
-        protected float[] pfaFingerSensorMaxValue;
-        protected float[] pfaFingerSensorMinValue;
+        //Max and Min sensor conductivity
+        protected float[] faFingerSensorMaxValue;
+        protected float[] faFingerSensorMinValue;
 
-        protected BoardStreamEventArgs psEventTaredQuart;
-        protected BoardStreamEventArgs psEventSensorState;
-        protected BoardStreamEventArgs psEventLinearAcceleration;
+        protected BoardStreamEventArgs sEventTaredQuart;
+        protected BoardStreamEventArgs sEventSensorState;
 
         /* 
             Function: InitModule
@@ -82,30 +82,30 @@ namespace GITEICaptoglove
 
             Parameters:
             nID - Captoglove ID (4 digits number)
-            etype - Captoglove use mode
+            eType - Captoglove use mode
 
             Example:
             --- Code
-            InitModule(2496, Module.peModuleType.TYPE_RIGHT_HAND);
+            InitModule(2496, Module.ModuleType.TYPE_RIGHT_HAND);
             ---
         */
-        protected void InitModule(int nID, peModuleType eType)
+        protected void InitModule(int nID, ModuleType eType)
         {
             SetModuleID(nID);
             SetModuleType(eType);
             SetModuleInitialized(false);
             SetModuleStarted(false);
             SetPropertiesRead(false);
-            DisableLog();
+            SetLogEnabled(false);
 
-            //Default values 
-            pfaFingerSensorMaxValue = new float[10];
-            pfaFingerSensorMinValue = new float[10];
+            //Initialize variables
+            faFingerSensorMaxValue = new float[10];
+            faFingerSensorMinValue = new float[10];
 
             for (int i = 0; i < 10; i++)
             {
-                pfaFingerSensorMaxValue[i] = 0f;
-                pfaFingerSensorMinValue[i] = 0f;
+                faFingerSensorMaxValue[i] = 0f;
+                faFingerSensorMinValue[i] = 0f;
             }
 
             SetModuleInitialized(true);
@@ -120,12 +120,12 @@ namespace GITEICaptoglove
 
              Example:
              --- Code
-             SetModuleType(Module.peModuleType.TYPE_RIGHT_HAND);
+             SetModuleType(Module.ModuleType.TYPE_RIGHT_HAND);
              ---
          */
-        private void SetModuleType(peModuleType eType)
+        private void SetModuleType(ModuleType eType)
         {
-            _eModuleType = eType;
+            eModuleType = eType;
         }
 
         /* 
@@ -133,9 +133,9 @@ namespace GITEICaptoglove
             Returns:
             Captoglove module use mode
         */
-        protected peModuleType GetModuleType()
+        protected ModuleType GetModuleType()
         {
-            return _eModuleType;
+            return eModuleType;
         }
 
         /* 
@@ -152,7 +152,7 @@ namespace GITEICaptoglove
         */
         private void SetModuleID(int nID)
         {
-            _nModuleID = nID;
+            nModuleID = nID;
             SetModuleName();
         }
 
@@ -163,19 +163,19 @@ namespace GITEICaptoglove
         */
         protected int GetModuleID()
         {
-            return _nModuleID;
+            return nModuleID;
         }
 
         /* 
             Function: SetModuleName
-            Creates and saves Captoglove module name.
+            Creates Captoglove module name to search BLE peripheral.
 
             Notes:
             SetModuleID() must be called first
         */
         private void SetModuleName()
         {
-            _sModuleName = "CaptoGlove" + _nModuleID.ToString();
+            sModuleName = "CaptoGlove" + nModuleID.ToString();
         }
 
         /* 
@@ -185,12 +185,12 @@ namespace GITEICaptoglove
         */
         protected string GetModuleName()
         {
-            return _sModuleName;
+            return sModuleName;
         }
 
         /* 
             Function: SetModuleInitialized
-            Saves whether Captoglove module is initialized or not.
+            Saves whether Captoglove module variables are initialized or not.
 
             Parameters:
             b - true or false
@@ -205,18 +205,18 @@ namespace GITEICaptoglove
         */
         private void SetModuleInitialized(bool b)
         {
-            _bModuleInitialized = b;
+            bModuleInitialized = b;
         }
 
         /* 
             Function: GetModuleInitialized
             Returns:
-            true - Captoglove module initialized
-            false - Captoglove module NOT initialized
+            true - Captoglove module variables initialized
+            false - Captoglove module variables NOT initialized
         */
         protected bool GetModuleInitialized()
         {
-            return _bModuleInitialized;
+            return bModuleInitialized;
         }
 
         /* 
@@ -236,7 +236,7 @@ namespace GITEICaptoglove
         */
         private void SetModuleStarted(bool b)
         {
-            _bModuleStarted = b;
+            bModuleStarted = b;
         }
 
         /* 
@@ -247,7 +247,7 @@ namespace GITEICaptoglove
         */
         protected bool GetModuleStarted()
         {
-            return _bModuleStarted;
+            return bModuleStarted;
         }
 
         /* 
@@ -267,7 +267,7 @@ namespace GITEICaptoglove
         */
         private void SetPropertiesRead(bool b)
         {
-            _bPropertiesRead = b;
+            bPropertiesRead = b;
         }
 
         /* 
@@ -278,28 +278,19 @@ namespace GITEICaptoglove
         */
         public bool GetPropertiesRead()
         {
-            return _bPropertiesRead;
+            return bPropertiesRead;
         }
 
         /* 
-            Function: EnableLog
-            Enables log printing during your app execution.
+            Function: SetLogEnabled
+            Enables or disables log printing during app execution.
 
             Notes:
             Log can be added with TraceLog() function.
         */
-        public void EnableLog()
+        public void SetLogEnabled(bool b)
         {
-            _bLogEnabled = true;
-        }
-
-        /* 
-            Function: DisableLog
-            Disables log printing during your app execution.        
-        */
-        public void DisableLog()
-        {
-            _bLogEnabled = false;
+            bLogEnabled = b;
         }
 
         /* 
@@ -310,7 +301,7 @@ namespace GITEICaptoglove
         */
         private bool GetLogEnabled()
         {
-            return _bLogEnabled;
+            return bLogEnabled;
         }
 
         /*
@@ -322,21 +313,21 @@ namespace GITEICaptoglove
             -1 - Error: Module not initialized
 
             Notes: 
-            Call this function in the Start() of your application.
+            Call this function from Start() function of Unity script.
         */
         public int Start()
         {
             if (GetModuleInitialized())
             {
-                TraceLog("Start, Looking for peripheral");
+                TraceLog("Start, looking for peripheral");
 
                 var adapterScanner = new AdapterScanner();
                 var adapter = adapterScanner.FindAdapter();
                 var configurator = new Configurator(adapter);
 
-                _IModuleCentral = configurator.GetBoardCentral();
-                _IModuleCentral.PeripheralsChanged += Central_PeripheralsChanged; //If peripheral is detected 
-                _IModuleCentral.StartScan(new Dictionary<PeripheralScanFlag, object> {
+                IModuleCentral = configurator.GetBoardCentral();
+                IModuleCentral.PeripheralsChanged += Central_PeripheralsChanged; //If peripheral is detected 
+                IModuleCentral.StartScan(new Dictionary<PeripheralScanFlag, object> {
                     { PeripheralScanFlag.ScanType, BleScanType.Balanced }
                 });
 
@@ -353,7 +344,7 @@ namespace GITEICaptoglove
 
         /* 
             Function: Central_PeripheralsChanged
-            Looks for Captoglove module ID among the modules that are connected to bluetooth.
+            Looks for Captoglove name among the modules connected to bluetooth.
 
             Parameres: 
             sender - Unused parameter
@@ -372,12 +363,12 @@ namespace GITEICaptoglove
                     TraceLog("Name: " + board.Name);
 
                     //If module ID is found
-                    if (board.Name == _sModuleName)
+                    if (board.Name == sModuleName)
                     {
-                        _IModuleBoard = board;
-                        _IModuleBoard.PropertyChanged += Peripheral_PropertyChanged; //Set configurations
-                        _IModuleBoard.StreamReceived += Peripheral_StreamReceived;   //Read stream
-                        await _IModuleBoard.StartAsync();
+                        IModuleBoard = board;
+                        IModuleBoard.PropertyChanged += Peripheral_PropertyChanged; //Set configurations
+                        IModuleBoard.StreamReceived += Peripheral_StreamReceived;   //Read stream
+                        await IModuleBoard.StartAsync();
                     }
                     return;
                 }
@@ -391,7 +382,7 @@ namespace GITEICaptoglove
 
         /* 
             Function: Peripheral_PropertyChanged
-            Detects if Captoglove module is connected to your app.
+            Detects if Captoglove module is connected to Unity app.
 
             Parameres: 
             sender - Unused parameter
@@ -401,9 +392,10 @@ namespace GITEICaptoglove
         {
             if (e.PropertyName == PeripheralProperty.Status)
             {
-                TraceLog("Board status: " + _IModuleBoard.Status.ToString());
+                TraceLog("Board status: " + IModuleBoard.Status.ToString());
 
-                if (_IModuleBoard.Status == PeripheralStatus.Connected)
+                //If module is connected
+                if (IModuleBoard.Status == PeripheralStatus.Connected)
                 {
                     SetProperties();
                     ReadProperties();
@@ -421,20 +413,17 @@ namespace GITEICaptoglove
         */
         private void Peripheral_StreamReceived(object sender, BoardStreamEventArgs e)
         {
+            //Quaternion rotation of module
             if (e.StreamType == BoardStreamType.TaredQuaternion)
             {
-                psEventTaredQuart = e;
+                sEventTaredQuart = e;
             }
 
+            //Sensors conductivity
             if (e.StreamType == BoardStreamType.SensorsState)
             {
-                psEventSensorState = e;
-            }
-            //CAPTURE MORE VALUES 
-            if (e.StreamType == BoardStreamType.LinearAcceleration)
-            {
-                psEventLinearAcceleration = e;
-            }
+                sEventSensorState = e;
+            }           
         }
 
         /* 
@@ -449,28 +438,24 @@ namespace GITEICaptoglove
             StreamTimeslots st = new StreamTimeslots();
 
             TraceLog("1. Calibrate module");
-            _IModuleBoard.CalibrateGyroAsync();
+            IModuleBoard.CalibrateGyroAsync();
 
             TraceLog("2. Tare module");
-            _IModuleBoard.TareAsync();
+            IModuleBoard.TareAsync();
 
             TraceLog("3. Set timeslots");
-            st.Set(6, BoardStreamType.TaredQuaternion);     //MoveArm movement
-                                                            //TODO Verify what is this for 
-            st.Set(1, BoardStreamType.LinearAcceleration);  //LinearAcc
+            st.Set(6, BoardStreamType.TaredQuaternion);     //Capture quaternion rotation
 
-            if (_eModuleType == peModuleType.TYPE_LEFT_HAND || _eModuleType == peModuleType.TYPE_RIGHT_HAND)
+            if (eModuleType == ModuleType.TYPE_LEFT_HAND || eModuleType == ModuleType.TYPE_RIGHT_HAND)
             {
-                st.Set(6, BoardStreamType.SensorsState);    //Fingers movement
+                st.Set(6, BoardStreamType.SensorsState);    //Capture sensors conductivity
             }
-
-            _IModuleBoard.StreamTimeslots.WriteAsync(st);
+            //Write timeslots
+            IModuleBoard.StreamTimeslots.WriteAsync(st);
 
             // Without commit previous configuration is temporal
             TraceLog("4. Commit changes");
-            _IModuleBoard.CommitChangesAsync();
-
-            //TODO VERIFY IF THIS CALIBRATION WORKS 
+            IModuleBoard.CommitChangesAsync();            
         }
 
         /* 
@@ -484,29 +469,29 @@ namespace GITEICaptoglove
             StreamTimeslots streamTimeSlots = new StreamTimeslots();
 
             TraceLog("1. Read firmware version");
-            TraceLog("" + _IModuleBoard.FirmwareVersion);
+            TraceLog("" + IModuleBoard.FirmwareVersion);
 
             TraceLog("2. Read emulation Mode");
-            await _IModuleBoard.EmulationModes.ReadAsync();
-            emulationModes = _IModuleBoard.EmulationModes.Value;
+            await IModuleBoard.EmulationModes.ReadAsync();
+            emulationModes = IModuleBoard.EmulationModes.Value;
             TraceLog(emulationModes.ToString());
 
             TraceLog("3. Read timeslots");
-            await _IModuleBoard.StreamTimeslots.ReadAsync();
-            streamTimeSlots = _IModuleBoard.StreamTimeslots.Value;
+            await IModuleBoard.StreamTimeslots.ReadAsync();
+            streamTimeSlots = IModuleBoard.StreamTimeslots.Value;
             TraceLog(streamTimeSlots.ToString());
 
-            if (_eModuleType == peModuleType.TYPE_LEFT_HAND || _eModuleType == peModuleType.TYPE_RIGHT_HAND)
+            if (eModuleType == ModuleType.TYPE_LEFT_HAND || eModuleType == ModuleType.TYPE_RIGHT_HAND)
             {
                 TraceLog("4. Read sensor calibration");
 
                 for (int i = 0; i < 10; i++)
                 {
-                    await _IModuleBoard.SensorDescriptors[i].ReadAsync();
-                    sensorDescriptor = _IModuleBoard.SensorDescriptors[i].Value;
+                    await IModuleBoard.SensorDescriptors[i].ReadAsync();
+                    sensorDescriptor = IModuleBoard.SensorDescriptors[i].Value;
                     TraceLog("Sensor [" + i + "]" + sensorDescriptor.ToString());
-                    pfaFingerSensorMinValue[i] = sensorDescriptor.MinValue;
-                    pfaFingerSensorMaxValue[i] = sensorDescriptor.MaxValue;
+                    faFingerSensorMinValue[i] = sensorDescriptor.MinValue; //Min sensor conductivity
+                    faFingerSensorMaxValue[i] = sensorDescriptor.MaxValue; //Max sensor conductivity
                 }
             }
 
@@ -518,28 +503,28 @@ namespace GITEICaptoglove
             Stops communication with Captoglove module.
 
             Notes: 
-            Call this function in the OnDestroy() of your application.
+            Call this function from OnDestroy() function of Unity script.
         */
         public async void Stop()
         {
             TraceLog("Stopping");
 
-            if (_IModuleBoard != null)
+            if (IModuleBoard != null)
             {
                 TraceLog("Stop Peripheral");
-                _IModuleBoard.StreamReceived -= Peripheral_StreamReceived;
-                _IModuleBoard.PropertyChanged -= Peripheral_PropertyChanged;
-                await _IModuleBoard.StopAsync();
-                _IModuleBoard.Dispose();
-                _IModuleBoard = null;
+                IModuleBoard.StreamReceived -= Peripheral_StreamReceived;
+                IModuleBoard.PropertyChanged -= Peripheral_PropertyChanged;
+                await IModuleBoard.StopAsync();
+                IModuleBoard.Dispose();
+                IModuleBoard = null;
             }
 
-            if (_IModuleCentral != null)
+            if (IModuleCentral != null)
             {
                 TraceLog("Stop Central");
-                _IModuleCentral.StopScan();
-                _IModuleCentral.PeripheralsChanged -= Central_PeripheralsChanged;
-                _IModuleCentral = null;
+                IModuleCentral.StopScan();
+                IModuleCentral.PeripheralsChanged -= Central_PeripheralsChanged;
+                IModuleCentral = null;
             }
 
             TraceLog("Stopped");
@@ -547,7 +532,7 @@ namespace GITEICaptoglove
 
         /* 
             Function: TraceLog
-            Prints log lines during your app execution.
+            Prints log lines during app execution.
 
             Example: 
             --- Code
@@ -555,12 +540,12 @@ namespace GITEICaptoglove
             ---
 
             Notes:  
-            Log is printed only if EnableLog() function is called first.
+            Log is printed only if SetLogEnabled(true) function is called first.
         */
         protected void TraceLog(string s)
         {
             if (GetLogEnabled())
-                Debug.Log(_sModuleName + " >>> " + s);
+                Debug.Log(sModuleName + " >>> " + s);
         }
 
     }

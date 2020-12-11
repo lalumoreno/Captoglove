@@ -1,5 +1,7 @@
 ﻿using System.IO;
 using UnityEngine;
+
+//SDK Captoglove
 using GSdkNet.Board;
 
 namespace GITEICaptoglove
@@ -12,66 +14,69 @@ namespace GITEICaptoglove
 		Laura Moreno - laamorenoro@unal.edu.co 
 		
 		Copyrigth:		
-		Copyrigth 2020 GITEI Universidad Nacional de Colombia, all rigths reserved. 
+		Copyrigth 2020 Universidad Nacional de Colombia, all rigths reserved. 
 		
-    */    
+    */
     public class MyHand : Module
     {
         /* 
-           Enum: eHandType
+           Enum: HandType
            List of possible ways to use Captoglove module with this class:
 
            TYPE_RIGHT_HAND - As right hand sensor
            TYPE_LEFT_HAND - As left hand sensor       
        */
-        public enum eHandType
+        public enum HandType
         {
             TYPE_RIGHT_HAND,
             TYPE_LEFT_HAND
         }
 
-        private eHandType _eHandType;
-        private eModuleAxis _ePitchAxis, _eYawAxis, _eRollAxis;
+        private HandType eHandType;
+        //hand axis
+        private ModuleAxis ePitchAxis, eYawAxis, eRollAxis;
+        
+        private float fHandXangle, fHandYangle, fHandZangle;
+        private int nThumbSensor, nIndexSensor, nMiddleSensor, nRingSensor, nPinkySensor, nPressureSensor;
+        private int nOmittedDegrees; //To avoid finger shaking
+        private bool bFingerEquationReady; 
 
-        private float _fHandXAngle, _fHandYAngle, _fHandZAngle;
-        private int _nThumbPos, _nIndexPos, _nMiddlePos, _nRingPos, _nPinkyPos, _nPressurePos;
-        private int _nOmittedDegrees;
-        private bool _bFingerVariablesSet; //A and B for equation
+        private float[] faSensorValue; //Sensor conductivity
+        private float[] faSensorTrigger; //Trigger to detect gestures 
 
-        private float[] _faSensorValue;
-        private float[] _faSensorTrigger;
+        //Constans of the movement equation (x= y*M + B)
+        private float fPitchEqM, fPitchEqB, fYawEqM, fYawEqB, fRollEqM, fRollEqB;
+        private float[] faFingerEqB;
+        private float[] faFingerEqM;
+        private float[] faFingerPh1EqM;
+        private float[] faFingerPh1EqB;
+        private float[] faFingerPh2EqM;
+        private float[] faFingerPh2EqB;
 
-        private float _fPitchVarA, _fPitchVarB, _fYawVarA, _fYawVarB, _fRollVarA, _fRollVarB;
-        private float[] _faFingerVarB;
-        private float[] _faFingerVarA;
-        private float[] _faFingerChild1VarA;
-        private float[] _faFingerChild1VarB;
-        private float[] _faFingerChild2VarA;
-        private float[] _faFingerChild2VarB;
+        private Vector3[] vaFingerAngle;
+        private Vector3[] vaPrevFingerAngle;
+        private Vector3[] vaFingerPh1Angle;
+        private Vector3[] vaFingerPh2Angle;
 
-        private Vector3[] _vaFingerAngle;
-        private Vector3[] _vaPrevFingerAngle;
-        private Vector3[] _vaFingerChild1Angle;
-        private Vector3[] _vaFingerChild2Angle;
+        private float[] faFingerMinRot;
+        private float[] faFingerMaxRot;
+        private float[] faFingerPh1MinRot;
+        private float[] faFingerPh1MaxRot;
+        private float[] faFingerPh2MinRot;
+        private float[] faFingerPh2MaxRot;
 
-        private float[] _faFingerMinRotation;
-        private float[] _faFingerMaxRotation;
-        private float[] _faFingerChild1MinRotation;
-        private float[] _faFingerChild1MaxRotation;
-        private float[] _faFingerChild2MinRotation;
-        private float[] _faFingerChild2MaxRotation;
+        private Transform tHandObj = null;
+        private Transform[] taFingerObj;
+        //Dynamic size for finger phalanges
+        private Transform[] taThumbPhOj;
+        private Transform[] taIndexPhObj;
+        private Transform[] taMiddlePhObj;
+        private Transform[] taRingPhObj;
+        private Transform[] taPinkyPhObj;
 
-        private Transform _tHand = null;
-        private Transform[] _taFinger;
-        //Dynamic size
-        private Transform[] _taThumbChild;
-        private Transform[] _taIndexChild;
-        private Transform[] _taMiddleChild;
-        private Transform[] _taRingChild;
-        private Transform[] _taPinkyChild;
-
-        private StreamWriter swHandWriter = null;
-        private StreamWriter swFingerWriter = null;
+        //To save data in a file 
+        private StreamWriter wHandWriter = null;
+        private StreamWriter wFingerWriter = null;
         private bool bHandFile = false;
         private bool bFingerFile = false;
 
@@ -85,68 +90,69 @@ namespace GITEICaptoglove
 
             Example:
             --- Code
-            MyHand RightHand = new MyHand(2496, MyHand.eHandType.TYPE_RIGHT_HAND);        
+            MyHand RightHand = new MyHand(2496, MyHand.HandType.TYPE_RIGHT_HAND);        
             ---
         */
-        public MyHand(int nID, eHandType eType)
+        public MyHand(int nID, HandType eType)
         {
             SetHandType(eType);
 
-            if (eType == eHandType.TYPE_RIGHT_HAND)
+            if (eType == HandType.TYPE_RIGHT_HAND)
             {
-                InitModule(nID, Module.peModuleType.TYPE_RIGHT_HAND);
-                SetFingerSensor(1, 3, 5, 7, 9, 2);
+                InitModule(nID, Module.ModuleType.TYPE_RIGHT_HAND);
+                SetFingerSensor(1, 3, 5, 7, 9, 2); //Default connection of the sensors in CaptoSensor
             }
             else
             {
-                InitModule(nID, Module.peModuleType.TYPE_LEFT_HAND);
+                InitModule(nID, Module.ModuleType.TYPE_LEFT_HAND);
                 SetFingerSensor(10, 8, 6, 3, 2, 9);
             }
 
-            SetFingerAlgorithmReady(false);
+            SetFingerEquationReady(false);
 
-            _faSensorValue = new float[10];
-            _faSensorTrigger = new float[10];
+            //Initialize variables
+            faSensorValue = new float[10];
+            faSensorTrigger = new float[10];
 
-            _faFingerVarA = new float[10];
-            _faFingerVarB = new float[10];
-            _faFingerChild1VarA = new float[10];
-            _faFingerChild1VarB = new float[10];
-            _faFingerChild2VarA = new float[10];
-            _faFingerChild2VarB = new float[10];
+            faFingerEqM = new float[10];
+            faFingerEqB = new float[10];
+            faFingerPh1EqM = new float[10];
+            faFingerPh1EqB = new float[10];
+            faFingerPh2EqM = new float[10];
+            faFingerPh2EqB = new float[10];
 
-            _vaFingerAngle = new Vector3[10];
-            _vaPrevFingerAngle = new Vector3[10];
-            _vaFingerChild1Angle = new Vector3[10];
-            _vaFingerChild2Angle = new Vector3[10];
+            vaFingerAngle = new Vector3[10];
+            vaPrevFingerAngle = new Vector3[10];
+            vaFingerPh1Angle = new Vector3[10];
+            vaFingerPh2Angle = new Vector3[10];
 
-            _faFingerMinRotation = new float[10];
-            _faFingerMaxRotation = new float[10];
-            _faFingerChild1MinRotation = new float[10];
-            _faFingerChild1MaxRotation = new float[10];
-            _faFingerChild2MinRotation = new float[10];
-            _faFingerChild2MaxRotation = new float[10];
+            faFingerMinRot = new float[10];
+            faFingerMaxRot = new float[10];
+            faFingerPh1MinRot = new float[10];
+            faFingerPh1MaxRot = new float[10];
+            faFingerPh2MinRot = new float[10];
+            faFingerPh2MaxRot = new float[10];
 
-            _taFinger = new Transform[10];
+            taFingerObj = new Transform[10];
 
             for (int i = 0; i < 10; i++)
             {
-                _faSensorValue[i] = 0f;
-                _faSensorTrigger[i] = 0f;
+                faSensorValue[i] = 0f;
+                faSensorTrigger[i] = 0f;
 
-                _faFingerVarA[i] = 0f;
-                _faFingerVarB[i] = 0f;
-                _faFingerChild1VarA[i] = 0f;
-                _faFingerChild1VarB[i] = 0f;
-                _faFingerChild2VarA[i] = 0f;
-                _faFingerChild2VarB[i] = 0f;
+                faFingerEqM[i] = 0f;
+                faFingerEqB[i] = 0f;
+                faFingerPh1EqM[i] = 0f;
+                faFingerPh1EqB[i] = 0f;
+                faFingerPh2EqM[i] = 0f;
+                faFingerPh2EqB[i] = 0f;
 
-                _vaFingerAngle[i] = new Vector3(0, 0, 0);
-                _vaPrevFingerAngle[i] = _vaFingerAngle[i];
-                _vaFingerChild1Angle[i] = new Vector3(0, 0, 0);
-                _vaFingerChild2Angle[i] = new Vector3(0, 0, 0);
+                vaFingerAngle[i] = new Vector3(0, 0, 0);
+                vaPrevFingerAngle[i] = vaFingerAngle[i];
+                vaFingerPh1Angle[i] = new Vector3(0, 0, 0);
+                vaFingerPh2Angle[i] = new Vector3(0, 0, 0);
 
-                _taFinger[i] = null;
+                taFingerObj[i] = null;
             }
 
             SetDefaultRotLimits();
@@ -161,26 +167,26 @@ namespace GITEICaptoglove
 
              Example:
              --- Code
-             SetHandType(MyHand.eHandType.TYPE_RIGHT_HAND);
+             SetHandType(MyHand.HandType.TYPE_RIGHT_HAND);
              ---
          */
-        private void SetHandType(eHandType eType)
+        private void SetHandType(HandType eType)
         {
-            _eHandType = eType;
+            eHandType = eType;
         }
 
         /* 
             Function: GetHandtype
             Returns:
-                Captoglove module use mode
+            Captoglove module use mode
         */
-        public eHandType GetHandtype()
+        public HandType GetHandtype()
         {
-            return _eHandType;
+            return eHandType;
         }
 
         /* 
-            Function: SetFingerAlgorithmReady
+            Function: SetFingerEquationReady
             Saves whether the algorithm for finger movement has been created or not.
 
             Parameters:
@@ -188,34 +194,34 @@ namespace GITEICaptoglove
 
             Example:
             --- Code
-            SetFingerAlgorithmReady(true);
+            SetFingerEquationReady(true);
             ---
 
             Notes: 
-            Normally used after SetFingerAlgorithm() function is completed.
+            Normally used after SetFingerEquation() function is completed.
         */
-        private void SetFingerAlgorithmReady(bool b)
+        private void SetFingerEquationReady(bool b)
         {
-            _bFingerVariablesSet = b;
+            bFingerEquationReady = b;
         }
 
         /* 
-            Function: GetFingerAlgorithmReady
+            Function: GetFingerEquationReady
             Returns:
             true - Finger algorithm has been created
             false - Finger algorithm has NOT been created
         */
-        private bool GetFingerAlgorithmReady()
+        private bool GetFingerEquationReady()
         {
-            return _bFingerVariablesSet;
+            return bFingerEquationReady;
         }
 
         /* 
             Function: SetOmittedDegrees
-            Saves the number of degrees that must be omitted in the movement of the fingers to avoid shaking.
+            Saves the number of degrees that must be omitted in the rotation of the fingers to avoid shaking.
 
             Parameters:
-            nDegrees - Number of degrees that must be omitted in the movement of the fingers
+            nDegrees - Number of degrees that must be omitted in the rotation of the fingers
 
             Example:
             --- Code
@@ -227,42 +233,39 @@ namespace GITEICaptoglove
         */
         private void SetOmittedDegrees(int nDegrees)
         {
-            _nOmittedDegrees = nDegrees;
+            nOmittedDegrees = nDegrees;
         }
 
         /* 
             Function: GetOmittedDegrees
             Returns:
-                Number of degrees that are omitted in the movement of the fingers
+            Number of degrees that are omitted in the movement of the fingers
         */
         public int GetOmittedDegrees()
         {
-            return _nOmittedDegrees;
+            return nOmittedDegrees;
         }
 
         /* 
-            Function: SetHandTransform
-            Attaches Captoglove module movement to hand transform.     
+            Function: SetHandObject
+            Attaches Captoglove module movement to hand object.     
 
             Parameters:
-            tHandObj - Hand transform
-            ePitchAxis - Transform axis for pitch movement 
-            eYawAxis   - Transform axis for yaw movement 
-            eRollAxis  - Transform axis for roll movement 
+            tHandObj - Hand object           
 
             Returns: 
             0 - Success
-            -1 - Error: Transform error
+            -1 - Object error
 
             Example:
             --- Code
-            SetHandTransform(transRH, Module.eModuleAxis.AXIS_X, Module.eModuleAxis.AXIS_Z, Module.eModuleAxis.AXIS_Y);
+            SetHandObject(transRH);
             ---
 
             Notes: 
-            Place the hand transform horizontally in the scene before assigning it in this function.        
+            Place the hand object horizontally in the scene before assigning it in this function to save default position.
         */
-        public int SetHandTransform(Transform tHandObj, eModuleAxis ePitchAxis, eModuleAxis eYawAxis, eModuleAxis eRollAxis)
+        public int SetHandObject(Transform tHandObj)
         {
             if (tHandObj == null)
             {
@@ -270,48 +273,49 @@ namespace GITEICaptoglove
                 return -1;
             }
 
-            _tHand = tHandObj;
-            _ePitchAxis = ePitchAxis;
-            _eYawAxis = eYawAxis;
-            _eRollAxis = eRollAxis;
-
-            _fHandXAngle = _tHand.localEulerAngles.x;
-            _fHandYAngle = _tHand.localEulerAngles.y;
-            _fHandZAngle = _tHand.localEulerAngles.z;
+            this.tHandObj = tHandObj;
+            //Default angles for 3D model provided with this library
+            this.ePitchAxis = Module.ModuleAxis.AXIS_X;
+            this.eYawAxis = Module.ModuleAxis.AXIS_Z;
+            this.eRollAxis = Module.ModuleAxis.AXIS_Y;
+            //Initial rotation 
+            fHandXangle = this.tHandObj.localEulerAngles.x;
+            fHandYangle = this.tHandObj.localEulerAngles.y;
+            fHandZangle = this.tHandObj.localEulerAngles.z;
 
             return 0;
         }
 
         /* 
-            Function: SetFingerTransform
-            Attaches Captoglove sensor movement to finger transform. 
+            Function: SetFingerObject
+            Attaches Captoglove sensor movement to finger object. 
 
             Parameters:
-            tThumbObj  - Thumb finger transform
-            tIndexObj  - Index finger transform
-            tMiddleObj - Middle finger transform
-            tRingObj   - Ring finger transform
-            tPinkyObj  - Pinky finger transform        
+            tThumbObj  - Thumb finger object
+            tIndexObj  - Index finger object
+            tMiddleObj - Middle finger object
+            tRingObj   - Ring finger object
+            tPinkyObj  - Pinky finger object        
 
             Returns: 
             0 - Success
-            -1 - Error: Finger transform error
-            -2 - Error: Child transform error
+            -1 - Finger object error
+            -2 - Child object error
 
             Example:
             --- Code
-            SetFingerTransform(transThuR,transIndR,transMidR,transRinR, transPinR);
+            SetFingerObject(transThuR,transIndR,transMidR,transRinR, transPinR);
             ---
 
             Notes: 
-            _This function expects each finger transform to have at least 2 children to simulate phalanges movement._ 
-            Place the finger transform horizontally in the scene before assigning it in this function.    
+            _This function expects each finger object to have at least 2 children to simulate phalanges movement._ 
+            Place the finger object horizontally in the scene before assigning it in this function to save default position.    
 
     */
-        public int SetFingerTransform(Transform tThumbObj, Transform tIndexObj, Transform tMiddleObj,
+        public int SetFingerObject(Transform tThumbObj, Transform tIndexObj, Transform tMiddleObj,
                                        Transform tRingObj, Transform tPinkyObj)
         {
-            int nChildCnt = 2;
+            int nChildCnt = 2; //two phalanges
 
             if (tThumbObj == null ||
                 tIndexObj == null ||
@@ -322,46 +326,47 @@ namespace GITEICaptoglove
                 TraceLog("Finger transform error");
                 return -1;
             }
+            //Get object children
+            taThumbPhOj     = tThumbObj.GetComponentsInChildren<Transform>();
+            taIndexPhObj    = tIndexObj.GetComponentsInChildren<Transform>();
+            taMiddlePhObj   = tMiddleObj.GetComponentsInChildren<Transform>();
+            taRingPhObj     = tRingObj.GetComponentsInChildren<Transform>();
+            taPinkyPhObj    = tPinkyObj.GetComponentsInChildren<Transform>();
 
-            _taThumbChild = tThumbObj.GetComponentsInChildren<Transform>();
-            _taIndexChild = tIndexObj.GetComponentsInChildren<Transform>();
-            _taMiddleChild = tMiddleObj.GetComponentsInChildren<Transform>();
-            _taRingChild = tRingObj.GetComponentsInChildren<Transform>();
-            _taPinkyChild = tPinkyObj.GetComponentsInChildren<Transform>();
-
-            if (_taThumbChild.Length < nChildCnt ||
-                _taIndexChild.Length < nChildCnt ||
-                _taMiddleChild.Length < nChildCnt ||
-                _taRingChild.Length < nChildCnt ||
-                _taPinkyChild.Length < nChildCnt)
+            if (taThumbPhOj.Length < nChildCnt ||
+                taIndexPhObj.Length < nChildCnt ||
+                taMiddlePhObj.Length < nChildCnt ||
+                taRingPhObj.Length < nChildCnt ||
+                taPinkyPhObj.Length < nChildCnt)
             {
                 TraceLog("Child transform error");
                 return -2;
             }
+            //Save objects
+            taFingerObj[nThumbSensor]   = tThumbObj;
+            taFingerObj[nIndexSensor]   = tIndexObj;
+            taFingerObj[nMiddleSensor]  = tMiddleObj;
+            taFingerObj[nRingSensor]    = tRingObj;
+            taFingerObj[nPinkySensor]   = tPinkyObj;
 
-            _taFinger[_nThumbPos] = tThumbObj;
-            _taFinger[_nIndexPos] = tIndexObj;
-            _taFinger[_nMiddlePos] = tMiddleObj;
-            _taFinger[_nRingPos] = tRingObj;
-            _taFinger[_nPinkyPos] = tPinkyObj;
-
+            //Save initial rotation of fingers
             for (int i = 0; i < 10; i++)
             {
-                if (_taFinger[i] != null)
-                    _vaFingerAngle[i] = _taFinger[i].localEulerAngles;
+                if (taFingerObj[i] != null)
+                    vaFingerAngle[i] = taFingerObj[i].localEulerAngles;
             }
+            //Save initial rotation of phalanges
+            vaFingerPh1Angle[nThumbSensor] = taThumbPhOj[nChildCnt - 1].localEulerAngles;
+            vaFingerPh1Angle[nIndexSensor] = taIndexPhObj[nChildCnt - 1].localEulerAngles;
+            vaFingerPh1Angle[nMiddleSensor] = taMiddlePhObj[nChildCnt - 1].localEulerAngles;
+            vaFingerPh1Angle[nRingSensor] = taRingPhObj[nChildCnt - 1].localEulerAngles;
+            vaFingerPh1Angle[nPinkySensor] = taPinkyPhObj[nChildCnt - 1].localEulerAngles;
 
-            _vaFingerChild1Angle[_nThumbPos] = _taThumbChild[nChildCnt - 1].localEulerAngles;
-            _vaFingerChild1Angle[_nIndexPos] = _taIndexChild[nChildCnt - 1].localEulerAngles;
-            _vaFingerChild1Angle[_nMiddlePos] = _taMiddleChild[nChildCnt - 1].localEulerAngles;
-            _vaFingerChild1Angle[_nRingPos] = _taRingChild[nChildCnt - 1].localEulerAngles;
-            _vaFingerChild1Angle[_nPinkyPos] = _taPinkyChild[nChildCnt - 1].localEulerAngles;
-
-            _vaFingerChild2Angle[_nThumbPos] = _taThumbChild[nChildCnt].localEulerAngles;
-            _vaFingerChild2Angle[_nIndexPos] = _taIndexChild[nChildCnt].localEulerAngles;
-            _vaFingerChild2Angle[_nMiddlePos] = _taMiddleChild[nChildCnt].localEulerAngles;
-            _vaFingerChild2Angle[_nRingPos] = _taRingChild[nChildCnt].localEulerAngles;
-            _vaFingerChild2Angle[_nPinkyPos] = _taPinkyChild[nChildCnt].localEulerAngles;
+            vaFingerPh2Angle[nThumbSensor] = taThumbPhOj[nChildCnt].localEulerAngles;
+            vaFingerPh2Angle[nIndexSensor] = taIndexPhObj[nChildCnt].localEulerAngles;
+            vaFingerPh2Angle[nMiddleSensor] = taMiddlePhObj[nChildCnt].localEulerAngles;
+            vaFingerPh2Angle[nRingSensor] = taRingPhObj[nChildCnt].localEulerAngles;
+            vaFingerPh2Angle[nPinkySensor] = taPinkyPhObj[nChildCnt].localEulerAngles;
 
             return 0;
         }
@@ -369,7 +374,7 @@ namespace GITEICaptoglove
 
         /* 
             Function: SetFingerSensor
-            Saves the sensor ID assigned in Captoglove module to each finger.
+            Saves the sensor ID connected in Captoglove module to each finger.
 
             Parameters:
             nThumbSensor - Captoglove sensor ID for thumb finger
@@ -406,26 +411,26 @@ namespace GITEICaptoglove
             }
 
             //ArrayPos = SensorID - 1 
-            _nThumbPos = nThumbSensor - 1;
-            _nIndexPos = nIndexSensor - 1;
-            _nMiddlePos = nMiddleSensor - 1;
-            _nRingPos = nRingSensor - 1;
-            _nPinkyPos = nPinkySensor - 1;
-            _nPressurePos = nPressureSensor - 1;
+            this.nThumbSensor = nThumbSensor - 1;
+            this.nIndexSensor = nIndexSensor - 1;
+            this.nMiddleSensor = nMiddleSensor - 1;
+            this.nRingSensor = nRingSensor - 1;
+            this.nPinkySensor = nPinkySensor - 1;
+            this.nPressureSensor = nPressureSensor - 1;
 
             return 0;
         }
 
         /* 
             Function: SetDefaultRotLimits
-            Set the limits for the rotation of the hand transform and each finger transform.
+            Set the limits for the rotation of the hand object and each finger object.
 
             Notes: 
-            The values configured in this function are valid only for the hand model delivered with these libraries.
+            The values configured in this function are valid only for the hand 3D model provided with this library.
         */
         private void SetDefaultRotLimits()
         {
-            if (GetHandtype() == eHandType.TYPE_RIGHT_HAND)
+            if (GetHandtype() == HandType.TYPE_RIGHT_HAND)
             {
                 SetPitchLimits(90, -90);
                 SetYawLimits(90, -90);
@@ -455,7 +460,7 @@ namespace GITEICaptoglove
 
         /* 
             Function: SetPitchLimits
-            Creates the algorithm for pitch movement of the hand. 
+            Creates the algorithm for pitch rotation of the hand. 
 
             Parameters:
             fMaxUpRotation - Angle of rotation where the hand is pointing upward in the pitch movement
@@ -467,20 +472,20 @@ namespace GITEICaptoglove
             ---
 
             Notes: 
-            These rotation values must be set as they are read in Unity enviroment for the hand transform.
+            Values must be set as they are read in Unity Inspector panel for hand object.
         */
         private void SetPitchLimits(float fMaxUpRotation, float fMaxDownRotation)
         {
             float fCaptogloveUpLimit = 0.5f;
             float fCaptogloveDownLimit = -0.5f;
 
-            _fPitchVarA = (fMaxUpRotation - fMaxDownRotation) / (fCaptogloveUpLimit - fCaptogloveDownLimit);
-            _fPitchVarB = fMaxDownRotation - _fPitchVarA * fCaptogloveDownLimit;
+            fPitchEqM = (fMaxUpRotation - fMaxDownRotation) / (fCaptogloveUpLimit - fCaptogloveDownLimit);
+            fPitchEqB = fMaxDownRotation - fPitchEqM * fCaptogloveDownLimit;
         }
 
         /* 
             Function: SetYawLimits
-            Creates the algorithm for yaw movement of the hand. 
+            Creates the algorithm for yaw rotation of the hand. 
 
             Parameters:
             fMaxRightRotation - Angle of rotation where the hand is pointing to the right in the yaw movement
@@ -492,20 +497,20 @@ namespace GITEICaptoglove
             ---
 
             Notes: 
-            These rotation values must be set as they are read in Unity enviroment for the hand transform.
+            Values must be set as they are read in Unity Inspector panel for hand object.
         */
         private void SetYawLimits(float fMaxRightRotation, float fMaxLeftRotation)
         {
             float fCaptogloveRightLimit = 0.5f;
             float fCaptogloveLeftLimit = -0.5f;
 
-            _fYawVarA = (fMaxLeftRotation - fMaxRightRotation) / (fCaptogloveRightLimit - fCaptogloveLeftLimit);
-            _fYawVarB = fMaxRightRotation - _fYawVarA * fCaptogloveLeftLimit;
+            fYawEqM = (fMaxLeftRotation - fMaxRightRotation) / (fCaptogloveRightLimit - fCaptogloveLeftLimit);
+            fYawEqB = fMaxRightRotation - fYawEqM * fCaptogloveLeftLimit;
         }
 
         /* 
             Function: SetRollLimits
-            Creates the algorithm for roll movement of the hand. 
+            Creates the algorithm for roll rotation of the hand. 
 
             Parameters:
             fMaxRightRotation - Angle of rotation where the hand is face up after turning it to the right.
@@ -517,20 +522,20 @@ namespace GITEICaptoglove
             ---
 
             Notes: 
-            These rotation values must be set as they are read in Unity enviroment for the hand transform.
+            Values must be set as they are read in Unity Inspector panel for hand object.
         */
         private void SetRollLimits(float fMaxRightRotation, float fMaxLeftRotation)
         {
             float fCaptogloveRightLimit = 1f;
             float fCaptogloveLeftLimit = -1f;
 
-            _fRollVarA = (fMaxLeftRotation - fMaxRightRotation) / (fCaptogloveRightLimit - fCaptogloveLeftLimit);
-            _fRollVarB = fMaxRightRotation - _fRollVarA * fCaptogloveLeftLimit;
+            fRollEqM = (fMaxLeftRotation - fMaxRightRotation) / (fCaptogloveRightLimit - fCaptogloveLeftLimit);
+            fRollEqB = fMaxRightRotation - fRollEqM * fCaptogloveLeftLimit;
         }
 
         /* 
             Function: SetThumbRotLimits
-            Saves the rotation limits for the thumb finger transform.
+            Saves the rotation limits for the thumb finger object.
 
             Parameters:
             fMinRotation - Angle of rotation where the thumb finger is fully extended
@@ -546,25 +551,25 @@ namespace GITEICaptoglove
             ---
 
             Notes: 
-            These rotation values must be set as they are read in Unity enviroment for the finger transform.
+            Values must be set as they are read in Unity Inspector panel for finger object.
         */
         private void SetThumbRotLimits(float fMinRotation, float fMaxRotation,
                                      float fMinRotation1, float fMaxRotation1,
                                      float fMinRotation2, float fMaxRotation2)
         {
-            _faFingerMinRotation[_nThumbPos] = fMinRotation;
-            _faFingerMaxRotation[_nThumbPos] = fMaxRotation;
+            faFingerMinRot[nThumbSensor] = fMinRotation;
+            faFingerMaxRot[nThumbSensor] = fMaxRotation;
 
-            _faFingerChild1MinRotation[_nThumbPos] = fMinRotation1;
-            _faFingerChild1MaxRotation[_nThumbPos] = fMaxRotation1;
+            faFingerPh1MinRot[nThumbSensor] = fMinRotation1;
+            faFingerPh1MaxRot[nThumbSensor] = fMaxRotation1;
 
-            _faFingerChild2MinRotation[_nThumbPos] = fMinRotation2;
-            _faFingerChild2MaxRotation[_nThumbPos] = fMaxRotation2;
+            faFingerPh2MinRot[nThumbSensor] = fMinRotation2;
+            faFingerPh2MaxRot[nThumbSensor] = fMaxRotation2;
         }
 
         /* 
             Function: SetIndexRotLimits
-            Saves the rotation limits for the index finger transform.
+            Saves the rotation limits for the index finger object.
 
             Parameters:
             fMinRotation - Angle of rotation where the index finger is fully extended
@@ -580,25 +585,25 @@ namespace GITEICaptoglove
             ---
 
             Notes: 
-            These rotation values must be set as they are read in Unity enviroment for the finger transform.
+            Values must be set as they are read in Unity Inspector panel for finger object.
         */
         private void SetIndexRotLimits(float fMinRotation, float fMaxRotation,
                                      float fMinRotation1, float fMaxRotation1,
                                      float fMinRotation2, float fMaxRotation2)
         {
-            _faFingerMinRotation[_nIndexPos] = fMinRotation;
-            _faFingerMaxRotation[_nIndexPos] = fMaxRotation;
+            faFingerMinRot[nIndexSensor] = fMinRotation;
+            faFingerMaxRot[nIndexSensor] = fMaxRotation;
 
-            _faFingerChild1MinRotation[_nIndexPos] = fMinRotation1;
-            _faFingerChild1MaxRotation[_nIndexPos] = fMaxRotation1;
+            faFingerPh1MinRot[nIndexSensor] = fMinRotation1;
+            faFingerPh1MaxRot[nIndexSensor] = fMaxRotation1;
 
-            _faFingerChild2MinRotation[_nIndexPos] = fMinRotation2;
-            _faFingerChild2MaxRotation[_nIndexPos] = fMaxRotation2;
+            faFingerPh2MinRot[nIndexSensor] = fMinRotation2;
+            faFingerPh2MaxRot[nIndexSensor] = fMaxRotation2;
         }
 
         /* 
             Function: SetMiddleRotLimits
-            Saves the rotation limits for the middle finger transform.
+            Saves the rotation limits for the middle finger object.
 
             Parameters:
             fMinRotation - Angle of rotation where the middle finger is fully extended
@@ -614,25 +619,25 @@ namespace GITEICaptoglove
             ---
 
             Notes: 
-            These rotation values must be set as they are read in Unity enviroment for the finger transform.
+            Values must be set as they are read in Unity Inspector panel for finger object.
         */
         private void SetMiddleRotLimits(float fMinRotation, float fMaxRotation,
                                       float fMinRotation1, float fMaxRotation1,
                                       float fMinRotation2, float fMaxRotation2)
         {
-            _faFingerMinRotation[_nMiddlePos] = fMinRotation;
-            _faFingerMaxRotation[_nMiddlePos] = fMaxRotation;
+            faFingerMinRot[nMiddleSensor] = fMinRotation;
+            faFingerMaxRot[nMiddleSensor] = fMaxRotation;
 
-            _faFingerChild1MinRotation[_nMiddlePos] = fMinRotation1;
-            _faFingerChild1MaxRotation[_nMiddlePos] = fMaxRotation1;
+            faFingerPh1MinRot[nMiddleSensor] = fMinRotation1;
+            faFingerPh1MaxRot[nMiddleSensor] = fMaxRotation1;
 
-            _faFingerChild2MinRotation[_nMiddlePos] = fMinRotation2;
-            _faFingerChild2MaxRotation[_nMiddlePos] = fMaxRotation2;
+            faFingerPh2MinRot[nMiddleSensor] = fMinRotation2;
+            faFingerPh2MaxRot[nMiddleSensor] = fMaxRotation2;
         }
 
         /* 
             Function: SetRingRotLimits
-            Saves the rotation limits for the ring finger transform.
+            Saves the rotation limits for the ring finger object.
 
             Parameters:
             fMinRotation - Angle of rotation where the ring finger is fully extended
@@ -648,25 +653,25 @@ namespace GITEICaptoglove
             ---
 
             Notes: 
-            These rotation values must be set as they are read in Unity enviroment for the finger transform.
+            Values must be set as they are read in Unity Inspector panel for finger object.
         */
         private void SetRingRotLimits(float fMinRotation, float fMaxRotation,
                                     float fMinRotation1, float fMaxRotation1,
                                     float fMinRotation2, float fMaxRotation2)
         {
-            _faFingerMinRotation[_nRingPos] = fMinRotation;
-            _faFingerMaxRotation[_nRingPos] = fMaxRotation;
+            faFingerMinRot[nRingSensor] = fMinRotation;
+            faFingerMaxRot[nRingSensor] = fMaxRotation;
 
-            _faFingerChild1MinRotation[_nRingPos] = fMinRotation1;
-            _faFingerChild1MaxRotation[_nRingPos] = fMaxRotation1;
+            faFingerPh1MinRot[nRingSensor] = fMinRotation1;
+            faFingerPh1MaxRot[nRingSensor] = fMaxRotation1;
 
-            _faFingerChild2MinRotation[_nRingPos] = fMinRotation2;
-            _faFingerChild2MaxRotation[_nRingPos] = fMaxRotation2;
+            faFingerPh2MinRot[nRingSensor] = fMinRotation2;
+            faFingerPh2MaxRot[nRingSensor] = fMaxRotation2;
         }
 
         /* 
             Function: SetPinkyRotLimits
-            Saves the rotation limits for the pinky finger transform.
+            Saves the rotation limits for the pinky finger object.
 
             Parameters:
             fMinRotation - Angle of rotation where the pinky finger is fully extended
@@ -682,68 +687,68 @@ namespace GITEICaptoglove
             ---
 
             Notes: 
-            These rotation values must be set as they are read in Unity enviroment for the finger transform.
+            Values must be set as they are read in Unity Inspector panel for finger object.
         */
         private void SetPinkyRotLimits(float fMinRotation, float fMaxRotation,
                                      float fMinRotation1, float fMaxRotation1,
                                      float fMinRotation2, float fMaxRotation2)
         {
-            _faFingerMinRotation[_nPinkyPos] = fMinRotation;
-            _faFingerMaxRotation[_nPinkyPos] = fMaxRotation;
+            faFingerMinRot[nPinkySensor] = fMinRotation;
+            faFingerMaxRot[nPinkySensor] = fMaxRotation;
 
-            _faFingerChild1MinRotation[_nPinkyPos] = fMinRotation1;
-            _faFingerChild1MaxRotation[_nPinkyPos] = fMaxRotation1;
+            faFingerPh1MinRot[nPinkySensor] = fMinRotation1;
+            faFingerPh1MaxRot[nPinkySensor] = fMaxRotation1;
 
-            _faFingerChild2MinRotation[_nPinkyPos] = fMinRotation2;
-            _faFingerChild2MaxRotation[_nPinkyPos] = fMaxRotation2;
+            faFingerPh2MinRot[nPinkySensor] = fMinRotation2;
+            faFingerPh2MaxRot[nPinkySensor] = fMaxRotation2;
         }
 
         /* 
             Function: MoveHand
-            Updates hand transform rotation according with Captoglove module movement.
+            Updates hand object rotation according with Captoglove module movement.
 
             Notes: 
-            Call this function in the Update() of your app to simulate hand movement.
+            Call this function in the Update() function of Unity script.
         */
         public void MoveHand()
         {
-            if (GetModuleStarted())
-                SetHandNewAngle(true);
-
-            //If hand transform was assigned
-            if (_tHand != null)
-                _tHand.localEulerAngles = new Vector3(_fHandXAngle, _fHandYAngle, _fHandZAngle);
+                                    //If hand object was assigned
+            if (GetModuleStarted() && tHandObj != null)
+            {
+                SetHandAngle(true);
+                tHandObj.localEulerAngles = new Vector3(fHandXangle, fHandYangle, fHandZangle);
+            }
         }
 
         /* 
             Function: MoveHandNoYaw
-            Updates hand transform rotation according with Captoglove module movement. Yaw movement is ommited.
+            Updates hand object rotation according with Captoglove module movement. Yaw movement is ommited.
 
             Notes: 
-            Call this function in the Update() of your app to simulate hand movement.
+            Call this function in the Update() function of Unity script.
             Normally used when arm simulation is also running so the yaw movement is done by the arm.
         */
         public void MoveHandNoYaw()
         {
             if (GetModuleStarted())
-                SetHandNewAngle(false);
+                SetHandAngle(false);
 
-            //If hand transform was assigned
-            if (_tHand != null)
-                _tHand.localEulerAngles = new Vector3(_fHandXAngle, _fHandYAngle, _fHandZAngle);
+            //If hand object was assigned
+            if (tHandObj != null)
+                tHandObj.localEulerAngles = new Vector3(fHandXangle, fHandYangle, fHandZangle);
         }
 
         /* 
-            Function: SetHandNewAngle
-            Calculates hand transform rotation according with Captoglove module movement.   
+            Function: SetHandAngle
+            Calculates hand object rotation according with Captoglove module movement.   
 
             Parameters:
-                bYaw - true or false to simulate yaw movement
+            bYaw - true or false to simulate yaw movement
 
         */
-        private void SetHandNewAngle(bool bYaw)
+        private void SetHandAngle(bool bYaw)
         {
-            var args = psEventTaredQuart as BoardQuaternionEventArgs;
+            var args = sEventTaredQuart as BoardQuaternionEventArgs;
             float pitchAngle;
             float yawAngle;
             float rollAngle;
@@ -754,204 +759,204 @@ namespace GITEICaptoglove
                 float quaternionY = args.Value.Y;
                 float quaternionZ = args.Value.Z;
 
-                pitchAngle = quaternionX * _fPitchVarA + _fPitchVarB;
-                yawAngle = quaternionY * _fYawVarA + _fYawVarB;
-                rollAngle = quaternionZ * _fRollVarA + _fRollVarB;
+                //Equation of a line (x= y*M + B)
+                pitchAngle  = quaternionX * fPitchEqM + fPitchEqB;
+                yawAngle    = quaternionY * fYawEqM + fYawEqB;
+                rollAngle   = quaternionZ * fRollEqM + fRollEqB;
 
                 if (!bYaw)
                     yawAngle = 0;
 
-                /*
-                //SetPitchRotation when hand is upside down TODO IMPROVE THIS MOVEMENT 
-                if((eType == ModuleType.TYPE_LEFT_HAND &&	quaternionZ>0.9) ||
-                    (eType == ModuleType.TYPE_RIGHT_HAND && quaternionZ<-0.9)) //Boca arriba
-                {
-                    //	pitchAngle = -pitchAngle;
-                    yawAngle  = -yawAngle;
-                    AsignAngle2Axes(yawAngle, pitchAngle, rollAngle);
-                }
-                else*/
-                {
-                    AsignAngle2Axes(pitchAngle, yawAngle, rollAngle);
+               Angle2Axes(pitchAngle, yawAngle, rollAngle);
 
-                }
             }
         }
 
         /* 
-            Function: AsignAngle2Axes
-            Set rotation angle to each axis of the hand transform. 
+            Function: Angle2Axes
+            Set rotation angle to each axis of the hand object. 
+
+            Parameters:
+            fPitchA - Angle of pitch rotation
+            fYawA - Angle of yaw rotation
+            fRollA - Angle of roll rotation
         */
-        private void AsignAngle2Axes(float fPitchA, float fYawA, float fRollA)
+        private void Angle2Axes(float fPitchA, float fYawA, float fRollA)
         {
-            switch (_ePitchAxis)
+            switch (ePitchAxis)
             {
-                case eModuleAxis.AXIS_X:
-                    _fHandXAngle = fPitchA;
+                case ModuleAxis.AXIS_X:
+                    fHandXangle = fPitchA;
                     break;
-                case eModuleAxis.AXIS_Y:
-                    _fHandYAngle = fPitchA;
+                case ModuleAxis.AXIS_Y:
+                    fHandYangle = fPitchA;
                     break;
-                case eModuleAxis.AXIS_Z:
-                    _fHandZAngle = fPitchA;
+                case ModuleAxis.AXIS_Z:
+                    fHandZangle = fPitchA;
                     break;
             }
 
-            switch (_eYawAxis)
+            switch (eYawAxis)
             {
-                case eModuleAxis.AXIS_X:
-                    _fHandXAngle = fYawA;
+                case ModuleAxis.AXIS_X:
+                    fHandXangle = fYawA;
                     break;
-                case eModuleAxis.AXIS_Y:
-                    _fHandYAngle = fYawA;
+                case ModuleAxis.AXIS_Y:
+                    fHandYangle = fYawA;
                     break;
-                case eModuleAxis.AXIS_Z:
-                    _fHandZAngle = fYawA;
+                case ModuleAxis.AXIS_Z:
+                    fHandZangle = fYawA;
                     break;
             }
 
-            switch (_eRollAxis)
+            switch (eRollAxis)
             {
-                case eModuleAxis.AXIS_X:
-                    _fHandXAngle = fRollA;
+                case ModuleAxis.AXIS_X:
+                    fHandXangle = fRollA;
                     break;
-                case eModuleAxis.AXIS_Y:
-                    _fHandYAngle = fRollA;
+                case ModuleAxis.AXIS_Y:
+                    fHandYangle = fRollA;
                     break;
-                case eModuleAxis.AXIS_Z:
-                    _fHandZAngle = fRollA;
+                case ModuleAxis.AXIS_Z:
+                    fHandZangle = fRollA;
                     break;
             }
         }
 
         /* 
             Function: MoveFingers
-            Updates each finger transform rotation according with Captoglove sensor movement.
+            Updates each finger object rotation according with Captoglove sensor value.
 
             Notes: 
-            Call this function in the Update() of your app to simulate fingers movement.
+            Call this function in the Update() function of Unity script to simulate fingers movement.
         */
         public void MoveFingers()
         {
-            if (GetModuleStarted())
-                SetFingersNewAngle();
+            float temp;
 
-            //If finger transform was assigned
-            if (_taFinger[_nThumbPos] != null)
+            //Needed to capture fingers gestures
+            if (GetModuleStarted())
+                SetFingersAngle();
+            
+            //If finger objects were assigne, update model rotation
+            if (taFingerObj[nThumbSensor] != null)
             {
                 for (int i = 0; i < 10; i++)
                 {
-                    if (_taFinger[i] != null)
-                        _taFinger[i].localEulerAngles = _vaFingerAngle[i];
+                    //Calculate new rotation
+                    temp = faSensorValue[i] * faFingerEqM[i] + faFingerEqB[i];              
+                    
+                    //Avoid shaking
+                    if (Mathf.Abs(temp - vaFingerAngle[i].x) > nOmittedDegrees)
+                    {
+                        vaFingerAngle[i].x = temp;
+                        vaFingerPh1Angle[i].x = faSensorValue[i] * faFingerPh1EqM[i] + faFingerPh1EqB[i];
+                        vaFingerPh2Angle[i].x = faSensorValue[i] * faFingerPh2EqM[i] + faFingerPh2EqB[i];
+                    }
+
+                    //Evaluate rotation limits
+                    if (GetHandtype() == HandType.TYPE_RIGHT_HAND &&
+                        (vaFingerAngle[i].x > faFingerMinRot[i]))
+                    {
+                        vaFingerAngle[i].x = faFingerMinRot[i];
+                        vaFingerPh1Angle[i].x = faFingerPh1MinRot[i];
+                        vaFingerPh2Angle[i].x = faFingerPh2MinRot[i];
+                    }
+                    else if (GetHandtype() == HandType.TYPE_LEFT_HAND &&
+                            (vaFingerAngle[i].x < faFingerMinRot[i]))
+                    {
+                        vaFingerAngle[i].x = faFingerMinRot[i];
+                        vaFingerPh1Angle[i].x = faFingerPh1MinRot[i];
+                        vaFingerPh2Angle[i].x = faFingerPh2MinRot[i];
+                    }
+
+                    //Set finger new rotation
+                    if (taFingerObj[i] != null)
+                        taFingerObj[i].localEulerAngles = vaFingerAngle[i];
                 }
+                
+                //Set phalanges new rotation
+                taThumbPhOj[1].localEulerAngles = vaFingerPh1Angle[nThumbSensor];
+                taIndexPhObj[1].localEulerAngles = vaFingerPh1Angle[nIndexSensor];
+                taMiddlePhObj[1].localEulerAngles = vaFingerPh1Angle[nMiddleSensor];
+                taRingPhObj[1].localEulerAngles = vaFingerPh1Angle[nRingSensor];
+                taPinkyPhObj[1].localEulerAngles = vaFingerPh1Angle[nPinkySensor];
 
-                _taThumbChild[1].localEulerAngles = _vaFingerChild1Angle[_nThumbPos];
-                _taIndexChild[1].localEulerAngles = _vaFingerChild1Angle[_nIndexPos];
-                _taMiddleChild[1].localEulerAngles = _vaFingerChild1Angle[_nMiddlePos];
-                _taRingChild[1].localEulerAngles = _vaFingerChild1Angle[_nRingPos];
-                _taPinkyChild[1].localEulerAngles = _vaFingerChild1Angle[_nPinkyPos];
-
-                _taThumbChild[2].localEulerAngles = _vaFingerChild2Angle[_nThumbPos];
-                _taIndexChild[2].localEulerAngles = _vaFingerChild2Angle[_nIndexPos];
-                _taMiddleChild[2].localEulerAngles = _vaFingerChild2Angle[_nMiddlePos];
-                _taRingChild[2].localEulerAngles = _vaFingerChild2Angle[_nRingPos];
-                _taPinkyChild[2].localEulerAngles = _vaFingerChild2Angle[_nPinkyPos];
-
-            }
+                taThumbPhOj[2].localEulerAngles = vaFingerPh2Angle[nThumbSensor];
+                taIndexPhObj[2].localEulerAngles = vaFingerPh2Angle[nIndexSensor];
+                taMiddlePhObj[2].localEulerAngles = vaFingerPh2Angle[nMiddleSensor];
+                taRingPhObj[2].localEulerAngles = vaFingerPh2Angle[nRingSensor];
+                taPinkyPhObj[2].localEulerAngles = vaFingerPh2Angle[nPinkySensor];
+            }            
         }
 
         /* 
-            Function: SetFingersNewAngle
-            Calculates each finger transform rotation according with Captoglove sensor movement.              
+            Function: SetFingersAngle
+            Calculates each finger object rotation according with Captoglove sensor value.              
         */
-        private void SetFingersNewAngle()
+        private void SetFingersAngle()
         {
-            var args = psEventSensorState as BoardFloatSequenceEventArgs;
-            float temp;
+            var args = sEventSensorState as BoardFloatSequenceEventArgs;            
 
             if (args != null)
             {
-                if (!GetFingerAlgorithmReady())
+                if (!GetFingerEquationReady())
                 {
-                    SetFingerAlgorithm();
+                    SetFingerEquation();
                     for (int i = 0; i < 10; i++)
                     {
-                        _faSensorTrigger[i] = (pfaFingerSensorMaxValue[i] - pfaFingerSensorMinValue[i]) / 3;
+                        faSensorTrigger[i] = (faFingerSensorMaxValue[i] - faFingerSensorMinValue[i]) / 3;
                     }
                 }
-
+                
                 for (int i = 0; i < 10; i++)
                 {
-                    _faSensorValue[i] = args.Value[i];
-                    temp = _faSensorValue[i] * _faFingerVarA[i] + _faFingerVarB[i];
-
-                    //Avoid shaking
-                    if (Mathf.Abs(temp - _vaFingerAngle[i].x) > _nOmittedDegrees)
-                    {
-                        _vaFingerAngle[i].x = temp;
-                        _vaFingerChild1Angle[i].x = args.Value[i] * _faFingerChild1VarA[i] + _faFingerChild1VarB[i];
-                        _vaFingerChild2Angle[i].x = args.Value[i] * _faFingerChild2VarA[i] + _faFingerChild2VarB[i];
-                    }
-                    
-                    if (GetHandtype() == eHandType.TYPE_RIGHT_HAND && 
-                        (_vaFingerAngle[i].x > _faFingerMinRotation[i]))                        
-                    {
-                        _vaFingerAngle[i].x = _faFingerMinRotation[i];
-                        _vaFingerChild1Angle[i].x = _faFingerChild1MinRotation[i];
-                        _vaFingerChild2Angle[i].x = _faFingerChild2MinRotation[i];
-                    }
-                    else if (GetHandtype() == eHandType.TYPE_LEFT_HAND &&
-                            (_vaFingerAngle[i].x < _faFingerMinRotation[i]))
-                    {
-                        _vaFingerAngle[i].x = _faFingerMinRotation[i];
-                        _vaFingerChild1Angle[i].x = _faFingerChild1MinRotation[i];
-                        _vaFingerChild2Angle[i].x = _faFingerChild2MinRotation[i];
-                    }
+                    faSensorValue[i] = args.Value[i];
                 }
             }
         }
 
         /* 
-            Function: SetFingerAlgorithm
-            Creates algorithm for finger movement.
+            Function: SetFingerEquation
+            Creates algorithm for finger movement according with sensor calibration.
         */
-        private void SetFingerAlgorithm()
+        private void SetFingerEquation()
         {
             float num = 0f;
 
             for (int i = 0; i < 10; i++)
             {
-                num = pfaFingerSensorMinValue[i] - pfaFingerSensorMaxValue[i];
+                num = faFingerSensorMinValue[i] - faFingerSensorMaxValue[i];
 
                 if (num != 0f)
                 {
-                    _faFingerVarA[i] = (_faFingerMaxRotation[i] - _faFingerMinRotation[i]) / num;
-                    _faFingerChild1VarA[i] = (_faFingerChild1MaxRotation[i] - _faFingerChild1MinRotation[i]) / num;
-                    _faFingerChild2VarA[i] = (_faFingerChild2MaxRotation[i] - _faFingerChild2MinRotation[i]) / num;
+                    faFingerEqM[i]      = (faFingerMaxRot[i] - faFingerMinRot[i]) / num;
+                    faFingerPh1EqM[i]   = (faFingerPh1MaxRot[i] - faFingerPh1MinRot[i]) / num;
+                    faFingerPh2EqM[i]   = (faFingerPh2MaxRot[i] - faFingerPh2MinRot[i]) / num;
                 }
 
-                _faFingerVarB[i] = _faFingerMinRotation[i] - (_faFingerVarA[i] * pfaFingerSensorMaxValue[i]);
-                _faFingerChild1VarB[i] = _faFingerChild1MinRotation[i] - (_faFingerChild1VarA[i] * pfaFingerSensorMaxValue[i]);
-                _faFingerChild2VarB[i] = _faFingerChild2MinRotation[i] - (_faFingerChild2VarA[i] * pfaFingerSensorMaxValue[i]);
+                faFingerEqB[i]    = faFingerMinRot[i] - (faFingerEqM[i] * faFingerSensorMaxValue[i]);
+                faFingerPh1EqB[i] = faFingerPh1MinRot[i] - (faFingerPh1EqM[i] * faFingerSensorMaxValue[i]);
+                faFingerPh2EqB[i] = faFingerPh2MinRot[i] - (faFingerPh2EqM[i] * faFingerSensorMaxValue[i]);
             }
 
-            //A and B are set correctly after the properties are read
+            //M and B are set correctly only after module properties are read
             if (GetPropertiesRead())
             {
                 TraceLog("Finger algorithm ready");
-                SetFingerAlgorithmReady(true);
+                SetFingerEquationReady(true);
             }
         }
 
         /* 
             Function: GetHandPosition
             Returns:
-                Global position of hand transform
+            Global position of hand object
         */
         public Vector3 GetHandPosition()
         {
-            if (_tHand != null)
-                return _tHand.position;
+            if (tHandObj != null)
+                return tHandObj.position;
             else
                 return new Vector3(0, 0, 0);
         }
@@ -959,25 +964,25 @@ namespace GITEICaptoglove
         /* 
             Function: GetHandRotation
             Returns:
-                Global euler angles of hand transform
+            Global euler angles of hand object
         */
         public Vector3 GetHandRotation()
         {
-            if (_tHand != null)
-                return _tHand.eulerAngles;
+            if (tHandObj != null)
+                return tHandObj.eulerAngles;
             else
                 return new Vector3(0, 0, 0);
         }
 
-        /* 
+         /* 
             Function: GetThumbPosition
             Returns:
-                Global position of thumb finger transform
+            Global position of thumb finger object
         */
         public Vector3 GetThumbPosition()
         {
-            if (_taFinger[_nThumbPos] != null)
-                return _taFinger[_nThumbPos].position;
+            if (taFingerObj[nThumbSensor] != null)
+                return taFingerObj[nThumbSensor].position;
             else
                 return new Vector3(0, 0, 0);
         }
@@ -985,12 +990,12 @@ namespace GITEICaptoglove
         /* 
             Function: GetIndexPosition
             Returns:
-                Global position of index finger transform
+            Global position of index finger object
         */
         public Vector3 GetIndexPosition()
         {
-            if (_taFinger[_nIndexPos] != null)
-                return _taFinger[_nIndexPos].position;
+            if (taFingerObj[nIndexSensor] != null)
+                return taFingerObj[nIndexSensor].position;
             else
                 return new Vector3(0, 0, 0);
         }
@@ -998,12 +1003,12 @@ namespace GITEICaptoglove
         /* 
             Function: GetMiddlePosition
             Returns:
-                Global position of middle finger transform
+            Global position of middle finger object
         */
         public Vector3 GetMiddlePosition()
         {
-            if (_taFinger[_nMiddlePos] != null)
-                return _taFinger[_nMiddlePos].position;
+            if (taFingerObj[nMiddleSensor] != null)
+                return taFingerObj[nMiddleSensor].position;
             else
                 return new Vector3(0, 0, 0);
         }
@@ -1011,12 +1016,12 @@ namespace GITEICaptoglove
         /* 
             Function: GetRingPosition
             Returns:
-                Global position of ring finger transform
+            Global position of ring finger object
         */
         public Vector3 GetRingPosition()
         {
-            if (_taFinger[_nRingPos] != null)
-                return _taFinger[_nRingPos].position;
+            if (taFingerObj[nRingSensor] != null)
+                return taFingerObj[nRingSensor].position;
             else
                 return new Vector3(0, 0, 0);
         }
@@ -1024,29 +1029,29 @@ namespace GITEICaptoglove
         /* 
             Function: GetPinkyPosition
             Returns:
-                Global position of pinky finger transform
+            Global position of pinky finger object
         */
         public Vector3 GetPinkyPosition()
         {
-            if (_taFinger[_nPinkyPos] != null)
-                return _taFinger[_nPinkyPos].position;
+            if (taFingerObj[nPinkySensor] != null)
+                return taFingerObj[nPinkySensor].position;
             else
                 return new Vector3(0, 0, 0);
         }
 
         /* 
-            Function: IsSensorPressed
+            Function: SensorPressed
             Returns:
-                true - Pressure sensor is being pressed
-                false - Pressure sensor is released        
+            true - Pressure sensor is being pressed
+            false - Pressure sensor is released        
         */
-        public bool IsSensorPressed()
+        public bool SensorPressed()
         {
             bool bRet = false;
 
             if (GetModuleStarted())
             {
-                if (_faSensorValue[_nPressurePos] > _faSensorTrigger[_nPressurePos])
+                if (faSensorValue[nPressureSensor] > faSensorTrigger[nPressureSensor])
                     bRet = true;
             }
 
@@ -1054,21 +1059,21 @@ namespace GITEICaptoglove
         }
 
         /* 
-            Function: IsHandClosed
+            Function: HandClosed
             Returns:
-                true - All fingers are bent more than 50%
-                false - All fingers are extended or bent less than 50%
+            true - All fingers are bent more than 50%
+            false - All fingers are extended or bent less than 50%
         */
-        public bool IsHandClosed()
+        public bool HandClosed()
         {
             bool bRet = false;
 
             if (GetModuleStarted())
             {
-                if (_faSensorValue[_nIndexPos] < _faSensorTrigger[_nIndexPos] &&
-                    _faSensorValue[_nMiddlePos] < _faSensorTrigger[_nMiddlePos] &&
-                    _faSensorValue[_nRingPos] < _faSensorTrigger[_nRingPos] &&
-                    _faSensorValue[_nPinkyPos] < _faSensorTrigger[_nPinkyPos])
+                if (faSensorValue[nIndexSensor] < faSensorTrigger[nIndexSensor] &&
+                    faSensorValue[nMiddleSensor] < faSensorTrigger[nMiddleSensor] &&
+                    faSensorValue[nRingSensor] < faSensorTrigger[nRingSensor] &&
+                    faSensorValue[nPinkySensor] < faSensorTrigger[nPinkySensor])
                 {
 
                     bRet = true;
@@ -1081,8 +1086,8 @@ namespace GITEICaptoglove
         /* 
             Function: FingerGesture1
             Returns:
-                true - Index finger is extended or bent less than 50% and the other fingers are bent more than 50%
-                false - Condition is not met
+            true - Index finger is extended or bent less than 50% and the other fingers are bent more than 50%
+            false - Condition is not met
         */
         public bool FingerGesture1()
         {
@@ -1090,10 +1095,10 @@ namespace GITEICaptoglove
 
             if (GetModuleStarted())
             {
-                if (_faSensorValue[_nIndexPos] > _faSensorTrigger[_nIndexPos] &&
-                    _faSensorValue[_nMiddlePos] < _faSensorTrigger[_nMiddlePos] &&
-                    _faSensorValue[_nRingPos] < _faSensorTrigger[_nRingPos] &&
-                    _faSensorValue[_nPinkyPos] < _faSensorTrigger[_nPinkyPos])
+                if (faSensorValue[nIndexSensor] > faSensorTrigger[nIndexSensor] &&
+                    faSensorValue[nMiddleSensor] < faSensorTrigger[nMiddleSensor] &&
+                    faSensorValue[nRingSensor] < faSensorTrigger[nRingSensor] &&
+                    faSensorValue[nPinkySensor] < faSensorTrigger[nPinkySensor])
                 {
                     bRet = true;
                 }
@@ -1114,10 +1119,10 @@ namespace GITEICaptoglove
 
             if (GetModuleStarted())
             {
-                if (_faSensorValue[_nIndexPos] > _faSensorTrigger[_nIndexPos] &&
-                    _faSensorValue[_nMiddlePos] > _faSensorTrigger[_nMiddlePos] &&
-                    _faSensorValue[_nRingPos] < _faSensorTrigger[_nRingPos] &&
-                    _faSensorValue[_nPinkyPos] < _faSensorTrigger[_nPinkyPos])
+                if (faSensorValue[nIndexSensor] > faSensorTrigger[nIndexSensor] &&
+                    faSensorValue[nMiddleSensor] > faSensorTrigger[nMiddleSensor] &&
+                    faSensorValue[nRingSensor] < faSensorTrigger[nRingSensor] &&
+                    faSensorValue[nPinkySensor] < faSensorTrigger[nPinkySensor])
                 {
                     bRet = true;
                 }
@@ -1138,10 +1143,10 @@ namespace GITEICaptoglove
 
             if (GetModuleStarted())
             {
-                if (_faSensorValue[_nIndexPos] > _faSensorTrigger[_nIndexPos] &&
-                    _faSensorValue[_nMiddlePos] > _faSensorTrigger[_nMiddlePos] &&
-                    _faSensorValue[_nRingPos] > _faSensorTrigger[_nRingPos] &&
-                    _faSensorValue[_nPinkyPos] < _faSensorTrigger[_nPinkyPos])
+                if (faSensorValue[nIndexSensor] > faSensorTrigger[nIndexSensor] &&
+                    faSensorValue[nMiddleSensor] > faSensorTrigger[nMiddleSensor] &&
+                    faSensorValue[nRingSensor] > faSensorTrigger[nRingSensor] &&
+                    faSensorValue[nPinkySensor] < faSensorTrigger[nPinkySensor])
                 {
                     bRet = true;
                 }
@@ -1151,30 +1156,30 @@ namespace GITEICaptoglove
         }
 
         /* 
-            Function: SaveHandMovInFile
-            Saves module data in file with following format: x hand rotation; y hand rotation; z hand rotation  
+            Function: SaveHandInFile
+            Saves module data in file with following format: x hand rotation; y hand rotation; z hand rotation [quaternions]
 
             Parameters:
-                sFileName - File name
+            sFileName - File name
 
             Example:
             --- Code
-            SaveHandMovInFile("RightHandMov.csv");
+            SaveHandInFile("RightHandMov.csv");
             ---
 
             Notes:
-            Call this function in Updated() of your app to save data continuously 
+            Call this function in Updated() of Unity script to save data continuously 
         */
-        public void SaveHandMovInFile(string sFileName)
+        public void SaveHandInFile(string sFileName)
         {
-            var args = psEventTaredQuart as BoardQuaternionEventArgs;
+            var args = sEventTaredQuart as BoardQuaternionEventArgs;
             string serializedData;
 
             if (args != null)
             {
                 if (!bHandFile)
                 {
-                    swHandWriter = new StreamWriter(sFileName, true);
+                    wHandWriter = new StreamWriter(sFileName, true);
                     bHandFile = true;
                 }
 
@@ -1188,56 +1193,56 @@ namespace GITEICaptoglove
                     quaternionZ.ToString() + "\n";
 
                 // Write to disk
-                if (swHandWriter != null)
-                    swHandWriter.Write(serializedData);
+                if (wHandWriter != null)
+                    wHandWriter.Write(serializedData);
 
             }
         }
 
         /* 
-            Function: SaveFingerMovInFile
-            Saves sensor data in file with following format: thumb finger; index finger; middle finger; ring finger; pinky finger; pressure sensor
+            Function: SaveFingerInFile
+            Saves sensor data in file with following format: thumb finger; index finger; middle finger; ring finger; pinky finger; pressure sensor [conductivity S/m]
 
             Parameters:
-                sFileName - File name
+            sFileName - File name
 
             Example:
             --- Code
-            SaveFingerMovInFile("RightFingerMov.csv");
+            SaveFingerInFile("RightFingerMov.csv");
             ---
 
             Notes:
             Call this function in Updated() of your app to save data continuously 
         */
-        public void SaveFingerMovInFile(string sFileName)
+        public void SaveFingerInFile(string sFileName)
         {
-            var args = psEventSensorState as BoardFloatSequenceEventArgs;
+            var args = sEventSensorState as BoardFloatSequenceEventArgs;
             string serializedData;
 
             if (args != null)
             {
                 if (!bFingerFile)
                 {
-                    swFingerWriter = new StreamWriter(sFileName, true);
+                    wFingerWriter = new StreamWriter(sFileName, true);
                     bFingerFile = true;
                 }
 
                 for (int i = 0; i < 10; i++)
                 {
-                    _faSensorValue[i] = args.Value[i];
+                    faSensorValue[i] = args.Value[i];
                 }
 
                 serializedData =
-                    _faSensorValue[_nThumbPos].ToString() + ";" +
-                    _faSensorValue[_nIndexPos].ToString() + ";" +
-                    _faSensorValue[_nMiddlePos].ToString() + ";" +
-                    _faSensorValue[_nRingPos].ToString() + ";" +
-                    _faSensorValue[_nPinkyPos].ToString() + ";" +
-                    _faSensorValue[_nPressurePos].ToString() + "\n";
+                    faSensorValue[nThumbSensor].ToString() + ";" +
+                    faSensorValue[nIndexSensor].ToString() + ";" +
+                    faSensorValue[nMiddleSensor].ToString() + ";" +
+                    faSensorValue[nRingSensor].ToString() + ";" +
+                    faSensorValue[nPinkySensor].ToString() + ";" +
+                    faSensorValue[nPressureSensor].ToString() + "\n";
 
                 // Write to disk
-                if (swFingerWriter != null)
-                    swFingerWriter.Write(serializedData);
+                if (wFingerWriter != null)
+                    wFingerWriter.Write(serializedData);
 
             }
         }

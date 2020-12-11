@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("han",["Function","Enumeration"],[["HandClosed",,[["GITEICaptoglove.MyHand",,,,0,"File:MyHand.cs:GITEICaptoglove.MyHand.HandClosed","CSharpClass:GITEICaptoglove.MyHand:HandClosed"]]],["HandType",,[["GITEICaptoglove.MyHand",,,,1,"File:MyHand.cs:GITEICaptoglove.MyHand.HandType","CSharpClass:GITEICaptoglove.MyHand:HandType"]]]]);

@@ -1,1 +1,0 @@
-NDSearch.OnPrefixDataLoaded("_eh",["Variable"],[["_eHandType",,[["GITEICaptoglove.MyHand",,,,0,"File:MyHand.cs:GITEICaptoglove.MyHand._eHandType","CSharpClass:GITEICaptoglove.MyHand:_eHandType"]]]]);

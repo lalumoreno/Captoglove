@@ -1,1 +1,0 @@
-NDSearch.OnPrefixDataLoaded("iss",["Function"],[["IsSensorPressed",,[["GITEICaptoglove.MyHand",,,,0,"File:MyHand.cs:GITEICaptoglove.MyHand.IsSensorPressed","CSharpClass:GITEICaptoglove.MyHand:IsSensorPressed"]]]]);

@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("tap",["Variable"],[["taPinkyPhObj",,[["GITEICaptoglove.MyHand",,,,0,"File:MyHand.cs:GITEICaptoglove.MyHand.taPinkyPhObj","CSharpClass:GITEICaptoglove.MyHand:taPinkyPhObj"]]]]);

@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("war",["Variable"],[["wArmWriter",,[["GITEICaptoglove.MyArm",,,,0,"File:MyArm.cs:GITEICaptoglove.MyArm.wArmWriter","CSharpClass:GITEICaptoglove.MyArm:wArmWriter"]]]]);

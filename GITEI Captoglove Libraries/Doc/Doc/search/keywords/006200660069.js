@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("bfi",["Variable"],[["bFingerEquationReady",,[["GITEICaptoglove.MyHand",,,,0,"File:MyHand.cs:GITEICaptoglove.MyHand.bFingerEquationReady","CSharpClass:GITEICaptoglove.MyHand:bFingerEquationReady"]]],["bFingerFile",,[["GITEICaptoglove.MyHand",,,,0,"File:MyHand.cs:GITEICaptoglove.MyHand.bFingerFile","CSharpClass:GITEICaptoglove.MyHand:bFingerFile"]]]]);

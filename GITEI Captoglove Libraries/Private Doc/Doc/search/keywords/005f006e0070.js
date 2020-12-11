@@ -1,1 +1,0 @@
-NDSearch.OnPrefixDataLoaded("_np",["Variable"],[["_nPinkyPos",,[["GITEICaptoglove.MyHand",,,,0,"File:MyHand.cs:GITEICaptoglove.MyHand._nPinkyPos","CSharpClass:GITEICaptoglove.MyHand:_nPinkyPos"]]],["_nPressurePos",,[["GITEICaptoglove.MyHand",,,,0,"File:MyHand.cs:GITEICaptoglove.MyHand._nPressurePos","CSharpClass:GITEICaptoglove.MyHand:_nPressurePos"]]]]);

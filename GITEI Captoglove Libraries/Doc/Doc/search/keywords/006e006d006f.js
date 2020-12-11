@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("nmo",["Variable"],[["nModuleID",,[["GITEICaptoglove.Module",,,,0,"File:Module.cs:GITEICaptoglove.Module.nModuleID","CSharpClass:GITEICaptoglove.Module:nModuleID"]]]]);

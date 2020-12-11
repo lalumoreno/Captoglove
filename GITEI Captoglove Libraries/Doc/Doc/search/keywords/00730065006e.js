@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("sen",["Function"],[["SensorPressed",,[["GITEICaptoglove.MyHand",,,,0,"File:MyHand.cs:GITEICaptoglove.MyHand.SensorPressed","CSharpClass:GITEICaptoglove.MyHand:SensorPressed"]]]]);

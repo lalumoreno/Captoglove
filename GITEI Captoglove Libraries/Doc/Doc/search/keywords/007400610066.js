@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("taf",["Variable"],[["taFingerObj",,[["GITEICaptoglove.MyHand",,,,0,"File:MyHand.cs:GITEICaptoglove.MyHand.taFingerObj","CSharpClass:GITEICaptoglove.MyHand:taFingerObj"]]]]);

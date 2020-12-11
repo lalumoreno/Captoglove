@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("tar",["Variable"],[["taRingPhObj",,[["GITEICaptoglove.MyHand",,,,0,"File:MyHand.cs:GITEICaptoglove.MyHand.taRingPhObj","CSharpClass:GITEICaptoglove.MyHand:taRingPhObj"]]],["tArmObj",,[["GITEICaptoglove.MyArm",,,,0,"File:MyArm.cs:GITEICaptoglove.MyArm.tArmObj","CSharpClass:GITEICaptoglove.MyArm:tArmObj"]]]]);

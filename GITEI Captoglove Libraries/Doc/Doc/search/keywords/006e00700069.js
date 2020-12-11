@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("npi",["Variable"],[["nPinkySensor",,[["GITEICaptoglove.MyHand",,,,0,"File:MyHand.cs:GITEICaptoglove.MyHand.nPinkySensor","CSharpClass:GITEICaptoglove.MyHand:nPinkySensor"]]]]);

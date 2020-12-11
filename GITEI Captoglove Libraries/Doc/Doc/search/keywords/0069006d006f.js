@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("imo",["Variable"],[["IModuleBoard",,[["GITEICaptoglove.Module",,,,0,"File:Module.cs:GITEICaptoglove.Module.IModuleBoard","CSharpClass:GITEICaptoglove.Module:IModuleBoard"]]],["IModuleCentral",,[["GITEICaptoglove.Module",,,,0,"File:Module.cs:GITEICaptoglove.Module.IModuleCentral","CSharpClass:GITEICaptoglove.Module:IModuleCentral"]]]]);

@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("eya",["Variable"],[["eYawAxis",,[["GITEICaptoglove.MyArm",,,,0,"File:MyArm.cs:GITEICaptoglove.MyArm.eYawAxis","CSharpClass:GITEICaptoglove.MyArm:eYawAxis"],["GITEICaptoglove.MyHand",,,,0,"File:MyHand.cs:GITEICaptoglove.MyHand.eYawAxis","CSharpClass:GITEICaptoglove.MyHand:eYawAxis"]]]]);

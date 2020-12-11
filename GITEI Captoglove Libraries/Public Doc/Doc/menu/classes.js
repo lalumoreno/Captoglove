@@ -1,1 +1,0 @@
-NDMenu.OnSectionLoaded("classes.js",[[1,"Module"],[1,"MyArm"],[1,"MyHand"]]);

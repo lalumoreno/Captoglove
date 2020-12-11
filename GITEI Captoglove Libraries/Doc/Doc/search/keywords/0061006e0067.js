@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("ang",["Function"],[["Angle2Axes",,[["GITEICaptoglove.MyArm",,,,0,"File:MyArm.cs:GITEICaptoglove.MyArm.Angle2Axes","CSharpClass:GITEICaptoglove.MyArm:Angle2Axes"],["GITEICaptoglove.MyHand",,,,0,"File:MyHand.cs:GITEICaptoglove.MyHand.Angle2Axes","CSharpClass:GITEICaptoglove.MyHand:Angle2Axes"]]]]);

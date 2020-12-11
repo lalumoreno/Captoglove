@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("fas",["Variable"],[["faSensorTrigger",,[["GITEICaptoglove.MyHand",,,,0,"File:MyHand.cs:GITEICaptoglove.MyHand.faSensorTrigger","CSharpClass:GITEICaptoglove.MyHand:faSensorTrigger"]]],["faSensorValue",,[["GITEICaptoglove.MyHand",,,,0,"File:MyHand.cs:GITEICaptoglove.MyHand.faSensorValue","CSharpClass:GITEICaptoglove.MyHand:faSensorValue"]]]]);

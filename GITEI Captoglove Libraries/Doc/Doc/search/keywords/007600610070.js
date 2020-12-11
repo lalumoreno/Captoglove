@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("vap",["Variable"],[["vaPrevFingerAngle",,[["GITEICaptoglove.MyHand",,,,0,"File:MyHand.cs:GITEICaptoglove.MyHand.vaPrevFingerAngle","CSharpClass:GITEICaptoglove.MyHand:vaPrevFingerAngle"]]]]);

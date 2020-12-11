@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("fro",["Variable"],[["fRollEqB",,[["GITEICaptoglove.MyHand",,,,0,"File:MyHand.cs:GITEICaptoglove.MyHand.fRollEqB","CSharpClass:GITEICaptoglove.MyHand:fRollEqB"]]],["fRollEqM",,[["GITEICaptoglove.MyHand",,,,0,"File:MyHand.cs:GITEICaptoglove.MyHand.fRollEqM","CSharpClass:GITEICaptoglove.MyHand:fRollEqM"]]]]);
